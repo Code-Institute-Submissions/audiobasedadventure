@@ -2,30 +2,19 @@
     margin-top: 20px;
 }
 
-.display {
-    height: 60vh;
-    box-sizing: border-box;
-    border: 1px solid black;
-    border-bottom: 0px;
-}
 
-/*the inputLog and the userInput*/
-.userConsole {
-    position: relative;
-}
 
-.userInputLog {
-    height: 20vh;
+.console {
+    height: 80vh;
     width: 100%;
-    box-sizing: border-box;
-    border: 1px solid black;
     overflow: auto;
     overflow-y: scroll;
     /*overflow: hidden;*/
     resize: none;
+    border: 0px;
 }
 
-#inputLog {
+#console {
     margin: 0px;
 }
 
