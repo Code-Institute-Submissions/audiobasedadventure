@@ -1,0 +1,41 @@
+.container {
+    margin-top: 20px;
+}
+
+.display {
+    height: 60vh;
+    box-sizing: border-box;
+    border: 1px solid black;
+    border-bottom: 0px;
+}
+
+/*the inputLog and the userInput*/
+.userConsole {
+    position: relative;
+}
+
+.userInputLog {
+    height: 20vh;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid black;
+    overflow: auto;
+    overflow-y: scroll;
+    /*overflow: hidden;*/
+    resize: none;
+}
+
+#inputLog {
+    margin: 0px;
+}
+
+#userInput {
+    padding: 0px;
+    border: 1px;
+    width: 100%;
+    height: 10vh;
+}
+
+input:focus {
+    outline: 0;
+}
