@@ -1,5 +1,5 @@
 var logArray = [];
-var descArray = ["Good Morning!"];
+var rooms = [];
 
 
 // PRINT TEXT =====================================================================================
@@ -27,11 +27,44 @@ function printText(toPrint) {
 
 // EVALUATE USER INPUT ============================================================================
 
-function evaluateUserInput(keyString) {
-    var userInput = document.getElementById("userInput").value;
-    if (userInput == keyString) {
-        printText("yay");
+function evaluateUserInput() {
+    if(document.getElementById("userInput").value == currentRoom.exitString) {
+        console.log("user input evaluated");
+        console.log(currentRoom.name);
+        currentRoom = currentRoom.roomChange();
+        console.log(currentRoom.name);
+        printText(currentRoom.roomDescription());
     }
 }
 
 // ================================================================================================
+
+
+
+// ROOM OBJECT =====================================================================================
+
+    rooms[0] = {
+    name: 'firstRoom', 
+    status: 'You are standing in a room.',
+    exits: 'There is a door to the North.',
+    exitString: 'north',
+    roomDescription: function() {
+        return rooms[0].status + "\n" + rooms[0].exits;
+    },
+    roomChange: function() {
+        return rooms[1];
+    }
+}
+
+    rooms[1] = {
+    name: 'secondRoom', 
+    status: 'You are in a new room.',
+    exits: 'There is a door to the South.',
+    roomDescription: function() {
+        return rooms[1].status + "\n" + rooms[1].exits;
+    }
+}
+
+// ================================================================================================
+
+var currentRoom = rooms[0];
