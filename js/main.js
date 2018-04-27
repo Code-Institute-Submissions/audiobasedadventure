@@ -82,12 +82,15 @@ async function printRoomInfo() {
         exitsCombined[i] = currentRoom.exits[i];
     }
     inputVisible(currentRoom.inputVisible);
-    printText(currentRoom.status + "\n" + exitsCombined.join("\n"));
+    printText(currentRoom.status[currentRoom.statusIndex] + "\n" + exitsCombined.join("\n"));
 
     await sleep(currentRoom.delayTime);
     console.log(currentRoom.audioName + " finished")
     inputVisible(currentRoom.inputVisibleAfterDelay);
-    printText(currentRoom.delayedDescription);
+    if(currentRoom.displayDelayedDescription){
+        printText(currentRoom.delayedDescription);
+    }
+    
 }
 
 // ================================================================================================
@@ -130,10 +133,21 @@ function evaluateUserInput() {
             if (currentRoom.keyRoomDict[userInputWords[i]]) {
                 console.log(currentRoom.keyRoomDict[userInputWords[i]]);
                 logArray = [];
-                currentRoom = rooms[currentRoom.keyRoomDict[userInputWords[i]]];
-                console.log("Current Room: " + currentRoom.name);
-                printText(printRoomInfo());
-                return;
+                // if the keyValue is a word
+                if (isNaN(currentRoom.keyRoomDict[userInputWords[i]] * 1)) {
+                    currentRoom = rooms[currentRoom.keyRoomDict[userInputWords[i]]];
+                    console.log("Current Room: " + currentRoom.name);
+                    printText(printRoomInfo());
+                    return;
+                }
+                // if the keyValue is a number
+                else {
+                    currentRoom.statusIndex = currentRoom.keyRoomDict[userInputWords[i]];
+                    currentRoom.playAudio = false;
+                    currentRoom.displayDelayedDescription = false;
+                    printText(printRoomInfo());
+                    return;
+                }
             }
 
         // return message when userInput does not contain keyString
@@ -151,7 +165,7 @@ function evaluateUserInput() {
 
 // ROOM OBJECT =====================================================================================
 
-let Room = function(name, status, exits, keyRoomDict, delayTime, delayedDescription, inputVisible, inputVisibleAfterDelay, audio, audioName, playAudio) {
+let Room = function(name, status, exits, keyRoomDict, delayTime, delayedDescription, inputVisible, inputVisibleAfterDelay, audio, audioName, playAudio, statusIndex, displayDelayedDescription) {
     this.name = name;
     this.status = status;
     this.exits = exits;
@@ -163,15 +177,16 @@ let Room = function(name, status, exits, keyRoomDict, delayTime, delayedDescript
     this.audio = audio;
     this.audioName = audioName;
     this.playAudio = playAudio;
+    this.statusIndex = statusIndex;
+    this.displayDelayedDescription = displayDelayedDescription;
 
 };
 
-rooms["bellsRoom"] = new Room("bellsRoom", "It is pitch dark.", [], { eight: "seeLightRoom" }, 45000, "Do you have the time?", false, true, openingAudio, "opening audio", true);
+rooms["firstRoomMiddle"] = new Room("firstRoom", ["It is pitch dark.", "Which way should you move?"], [], { eight: "1", right: "secondRoom" }, 45000, "Do you have the time?", false, true, openingAudio, "opening audio", true, 0, true);
 
-rooms["seeLightRoom"] = new Room("seeLightRoom", "You see a sliver of light peeking through on the ground in front of you. \nIt must be from under a door. \nIs there someone out there?", [""], { door: "firstRoomNorth" }, 0, "", true, true, lightSwitchOnOff, "lightSwitchOnOff", true);
 
-rooms["firstRoomNorth"] = new Room("firstRoomNorth", "The door is locked. \nMaybe theres something in you could use to open the door? \nTry looking around the room (north, south, east, west)", [""], { south: "bellsRoom" }, 10000, "Theres someone outside the door...", true, true, laugh_1, "laugh_1", true);
+
 
 // ================================================================================================
 
-var currentRoom = rooms["bellsRoom"];
+var currentRoom = rooms["firstRoomMiddle"];
