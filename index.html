@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,6 +9,8 @@
 
     <!--bootstrap-->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!--jquery-->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <!--main js sheet-->
     <script src="js/main.js"></script>
     <!--style sheet-->
@@ -18,16 +21,17 @@
 
 
 
-<body onload="printText(printRoomInfo()); playAudio();">
-    
+<body onload="printRoomInfo(); playAudio()">
+
     <div class="container">
 
         <!--inputLog-->
         <textarea id="console" class="console" disabled></textarea>
 
         <!--user input form: submits on enter-->
-        <form id="myForm" name="answerForm" onsubmit="printText(); evaluateUserInput(); inputVisible(); this.reset(); return false;" action="#">
-            <input type="text" name="userInput" id="userInput" placeholder="your response..." autofocus autocomplete="off"></input>
+        <form id="myForm" name="answerForm" onsubmit="printText(); evaluateUserInput(); inputVisible(); playAudio(); this.reset(); return false;" action="#">
+            <!--hidden by default-->
+            <input type="text" name="userInput" id="userInput" placeholder="your response..." autofocus autocomplete="off" visibility = "hidden"></input>
         </form>
 
     </div>
