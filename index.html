@@ -21,7 +21,7 @@
 
 
 
-<body onload="printRoomInfo(); playAudio()">
+<body onload="printToLog(currentRoom.descriptions[0]); playAudio()">
 
     <div class="container">
 
@@ -29,7 +29,7 @@
         <textarea id="console" class="console" disabled></textarea>
 
         <!--user input form: submits on enter-->
-        <form id="myForm" name="answerForm" onsubmit="printText(); evaluateUserInput(); inputVisible(); playAudio(); this.reset(); return false;" action="#">
+        <form id="myForm" name="answerForm" onsubmit="processUserInput(); this.reset(); return false;" action="#">
             <!--hidden by default-->
             <input type="text" name="userInput" id="userInput" placeholder="your response..." autofocus autocomplete="off" visibility = "hidden"></input>
         </form>
