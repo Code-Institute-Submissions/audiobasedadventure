@@ -1,26 +1,24 @@
 // IMPLEMENT TESTING ON USERINPUT
-// make delayed description occur on audio end
-// fix scroll bar issue
-// get user input once
 // use jquery
 // build inventory
 // implement verbs
 // create item class
+// create audio engine
+// fix history
+// build audio objects
 
 var logArray = [];
 var logHistoryArray = [];
 var rooms = [];
+var audioObjects = [];
 
-var openingAudio = new Audio("audio/grandfather_clock.wav");
-openingAudio.load();
-var lightSwitchOnOff = new Audio("audio/light_switch_on_off.wav");
-lightSwitchOnOff.load();
-var laugh_1 = new Audio("audio/laugh_1.wav");
-laugh_1.load();
-
+var grandfatherClock = new Audio("audio/grandfather_clock.wav");
+grandfatherClock.load();
+var waterDrops = new Audio("audio/water_drops.wav");
+waterDrops.load();
 
 
-// PROCESS USER INPUT ============================================================================
+// PROCESS USER INPUT =============================================================================
 
 function processUserInput() {
 
@@ -36,6 +34,12 @@ function processUserInput() {
         // parse userInput
         userInput = parser(userInput);
         console.log("userInput parsed: " + userInput);
+
+        // print history
+        if (userInput == "h") {
+            printLogHistory();
+            return;
+        }
 
         // split userInput into words
         var userInputWords = userInput.split(" ");
@@ -53,23 +57,35 @@ function processUserInput() {
 
                 // if the keyValue is a word
                 if (isNaN(currentRoom.keyRoomDict[userInputWords[i]] * 1)) {
-                    // change currentRoom
-                    currentRoom = rooms[currentRoom.keyRoomDict[userInputWords[i]]];
-                    console.log("Current Room: " + currentRoom.name);
-                    // process room attributes
-                    processRoomAttributes();
-                    // print new room description to log
-                    printToLog(currentRoom.descprition[currentRoom.descriptionIndex]);
-                    // play new room audio
-                    playAudio();
-                    return;
+
+                    // this condition should evaluate to true if the key returns a room value
+                    if (rooms[currentRoom.keyRoomDict[userInputWords[i]]] instanceof Object) {
+                        // change currentRoom
+                        console.log(typeof(rooms[currentRoom.keyRoomDict[userInputWords[i]]]));
+                        currentRoom = rooms[currentRoom.keyRoomDict[userInputWords[i]]];
+                        console.log("Current Room: " + currentRoom.name);
+                        // process room attributes
+                        processRoomAttributes();
+                        // print new room description to log
+                        printToLog(currentRoom.descriptions[currentRoom.descriptionIndex]);
+
+                        audioBuffer = audioObjects[currentRoom.audioObject]
+                        // play new room audio
+                        playAudio(audioBuffer);
+                        return;
+                    }
+                    // If the key returns an undefined value
+                    else {
+                        // print the value associated with the key
+                        printToLog(currentRoom.keyRoomDict[userInputWords[i]]);
+                        return;
+                    }
                 }
                 // if the keyValue is a number
                 else {
                     currentRoom.descriptionIndex = currentRoom.keyRoomDict[userInputWords[i]];
                     currentRoom.playAudio = false;
-                    currentRoom.displayDelayedDescription = false;
-                    printToLog(currentRoom.description);
+                    printToLog(currentRoom.descriptions[currentRoom.descriptionIndex]);
                     return;
                 }
             }
@@ -82,10 +98,14 @@ function processUserInput() {
 }
 // ================================================================================================
 
-// PARSER ========================================================================================
+
+
+
+// PARSER =========================================================================================
 
 function parser(userInput) {
-    userInput = userInput.replace("8", "eight");
+    userInput = userInput.replace("8", "eight")
+    userInput = userInput.replace("history", "h");
     return userInput;
 }
 
@@ -105,6 +125,7 @@ function processRoomAttributes() {
 // INPUT VISIBLE ==================================================================================
 
 function inputVisible(visibility) {
+    console.log("checked visibility")
     if (visibility == false) {
         document.getElementById("userInput").style.visibility = 'hidden';
     }
@@ -116,7 +137,7 @@ function inputVisible(visibility) {
 // ================================================================================================
 
 
-// PRINT TO LOG =====================================================================================
+// PRINT TO LOG ===================================================================================
 
 function printToLog(textToPrint) {
 
@@ -124,46 +145,59 @@ function printToLog(textToPrint) {
     logArray.push(textToPrint);
     // print log
     document.getElementById("console").innerHTML = logArray.join("\n");
+    console.log("printed to log")
 
-    // keep scroll bar at bottom
-    var textarea = document.getElementById("console");
-    if (textarea != null) {
-        textarea.scrollTop = textarea.scrollHeight;
-    }
+    // // keep scroll bar at bottom
+    // var textarea = document.getElementById("console");
+    // if (textarea != null) {
+    //     textarea.scrollTop = textarea.scrollHeight;
+    // }
 }
 // ================================================================================================
 
 
 
-// AUDIO =====================================================================================
+// PRINT LOG  HISTORY =============================================================================
 
-function playAudio() {
-    if (currentRoom.playAudio == true) {
-        currentRoom.audio.play();
-        console.log("playing " + currentRoom.audioName)
+function printLogHistory() {
+
+    // print log
+    document.getElementById("console").reset();
+    document.getElementById("console").innerHTML += "\nLog history: " + (logHistoryArray.join("\n")) + "\n" +
+        currentRoom.descriptions[currentRoom.descriptionIndex];
+    console.log("printed log history")
+}
+// ================================================================================================
+
+
+
+// AUDIO ==========================================================================================
+
+function playAudio(audioIn) {
+
+    console.log(audioIn);
+
+    if (audioIn.active) {
+        audioIn.audio.setVolume(audioIn.amplitude);
+        audioIn.audio.pan(audioIn.pan);
+        audioIn.audio.play();
+        console.log("playing " + audioIn.audioName)
     }
+
+
     // runs audioEndedFunction when audio has ended
     currentRoom.audio.addEventListener('ended', function() {
-        console.log(currentRoom.audioName + " ended")
+        console.log(audioIn.audioName + " ended")
         // print last description in array
-        printToLog(currentRoom.descriptions[currentRoom.descriptions.length-1])
+        printToLog(currentRoom.descriptions[currentRoom.descriptions.length - 1])
+        // if the input is invisible make it visible
+        inputVisible(true);
     })
 }
 
 // ================================================================================================
 
 
-// AUDIO ON END =====================================================================================
-
-function audioEnded() {
-    console.log(currentRoom.audioName + " finished")
-    inputVisible(currentRoom.inputVisibleAfterDelay);
-    if (currentRoom.displayDelayedDescription) {
-        printToLog(currentRoom.delayedDescription);
-    }
-}
-
-// ================================================================================================
 
 
 
@@ -172,6 +206,21 @@ function audioEnded() {
 
 
 
+
+// AUDIO OBJECT =====================================================================================
+
+let audioObject = function(audio, audioName, amplitude, pan, coordinates, active) {
+    this.audio = audio;
+    this.audioName = audioName;
+    this.amplitude = amplitude;
+    this.pan = pan;
+    this.coordinates = coordinates;
+    this.active = active;
+};
+
+
+audioObjects[grandfatherClock] = new Audio(grandfatherClock, "grandfatherClock", .5, -1, [-1, 0], true);
+audioObjects[waterDrops] = new Audio(waterDrops, "waterDrops", .5, 1, [1, 0], true);
 
 
 
@@ -184,23 +233,56 @@ function audioEnded() {
 
 // ROOM OBJECT =====================================================================================
 
-let Room = function(name, descriptions, descriptionIndex, keyRoomDict, inputVisible, inputVisibleAfterDelay, audio, audioName, playAudio, displayDelayedDescription) {
+let Room = function(name, descriptions, descriptionIndex, keyRoomDict, inputVisible, inputVisibleAfterDelay, audioObject, displayDelayedDescription, coordinates, interactableItems) {
     this.name = name;
     this.descriptions = descriptions;
     this.descriptionIndex = descriptionIndex;
     this.keyRoomDict = keyRoomDict;
     this.inputVisible = inputVisible;
     this.inputVisibleAfterDelay = inputVisibleAfterDelay;
-    this.audio = audio;
-    this.audioName = audioName;
-    this.playAudio = playAudio;
+    this.audioObject = audioObject;
+    this.coordinates = coordinates;
+    this.interactableItems = interactableItems;
 };
 
 // last description is the delayed description
 
-rooms["firstRoomMiddle"] = new Room("firstRoom", ["It is pitch black.", "Which way should you move?", "Do you have the time?"], 0, { eight: "1", right: "secondRoom" }, false, true, openingAudio, "opening audio", true);
+rooms["prologue"] = new Room("prologue", ["It is pitch black.", "Do you have the time?"], 0, { eight: "firstRoomMiddle" }, false, true, "grandfatherClock", [0, 0], [0]);
 
+
+
+// MIDDLE 
+rooms["firstRoomMiddle"] = new Room(
+    "firstRoomMiddle", ["(m) The ground is completely soaked. There's about an inch of water and its freezing.", "Which way should you move?"], 0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, 0], []);
+
+
+// NORTH
+rooms["firstRoomNorth"] = new Room(
+    "firstRoomNorth", ["n Which way should you move?"],
+    0, { north: "You walk north but collide head-first into what feels like a door... ouch", south: "firstRoomMiddle", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, 1], []);
+
+
+
+// SOUTH
+rooms["firstRoomSouth"] = new Room(
+    "firstRoomSouth", ["(s) Which way should you move?"],
+    0, { north: "firstRoomMiddle", south: "You walk south but are obstructed by some sort of furniture...", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, -1], []);
+
+
+
+// EAST
+rooms["firstRoomEast"] = new Room(
+    "firstRoomEast", ["(e) Which way should you move?"],
+    0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "There's some sort of device in your way.", west: "firstRoomMiddle" }, true, true, "waterDrops", [1, 0], []);
+
+
+
+// WEST
+rooms["firstRoomWest"] = new Room(
+    "firstRoomWest", ["((w) Which way should you move?"],
+    0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "firstRoomMiddle", west: "There's a metal structure running along the wall." }, true, true, "waterDrops", [-1, 0], []);
 
 // ================================================================================================
 
-var currentRoom = rooms["firstRoomMiddle"];
+var currentRoom = rooms["prologue"];
+var audioBuffer = audioObjects["grandfatherClock"];
