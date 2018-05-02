@@ -24,6 +24,9 @@
     <!--main js sheet-->
     <script src="js/main.js"></script>
     
+    <!--audio js sheet-->
+    <script src="js/audio.js"></script>
+    
     <!--style sheet-->
     <link rel="stylesheet" href="css/style.css" type="text/css" />
 
@@ -32,7 +35,7 @@
 
 
 
-<body onload="printToLog(currentRoom.descriptions[0]); playAudio(audioBuffer);  inputVisible(currentRoom.inputVisible)">
+<body onload="printToLog(currentRoom.descriptions[0]); inputVisible(currentRoom.inputVisible); preload(); setup(); draw()">
 
     <div class="container">
 

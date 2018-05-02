@@ -7,14 +7,22 @@
 // fix history
 // build audio objects
 
+// HOW TO IMPLEMENT JASMINE - wroks best for functions that return something. parser, printTo Log
+// HOW TO SORT OUT LOADSOUND
+
 var logArray = [];
 var logHistoryArray = [];
 var rooms = [];
-var audioObjects = [];
+var sounds = [];
+
+var grandfatherClock;
+var waterDrops;
+var currentAudio;
+var previousAudio;
+var hasPlayed = false;
 
 
-var grandfatherClock = loadSound("audio/grandfather_clock.wav");
-var waterDrops = loadSound("audio/water_drops.wav");
+
 
 
 
@@ -68,10 +76,6 @@ function processUserInput() {
                         processRoomAttributes();
                         // print new room description to log
                         printToLog(currentRoom.descriptions[currentRoom.descriptionIndex]);
-
-                        audioBuffer = audioObjects[currentRoom.audioObject]
-                        // play new room audio
-                        playAudio(audioBuffer);
                         return;
                     }
                     // If the key returns an undefined value
@@ -171,47 +175,12 @@ function printLogHistory() {
 
 
 
-// AUDIO ==========================================================================================
-
-function playAudio(audioIn) {
-
-    console.log(audioIn);
-
-    if (audioIn.active) {
-        audioIn.audio.setVolume(audioIn.amplitude);
-        audioIn.audio.pan(audioIn.pan);
-        audioIn.audio.play();
-        console.log("playing " + audioIn.audioName)
-    }
-
-
-    // // runs audioEndedFunction when audio has ended
-    // audioIn.audio.addEventListener('ended', function() {
-    //     console.log(audioIn.audioName + " ended")
-    //     // print last description in array
-    //     printToLog(currentRoom.descriptions[currentRoom.descriptions.length - 1])
-    //     // if the input is invisible make it visible
-    //     inputVisible(true);
-    // })
-}
-
-// ================================================================================================
-
-
-
-
-
-
-
-
-
 
 
 // AUDIO OBJECT =====================================================================================
 
-let audioObject = function(audio, audioName, amplitude, pan, coordinates, active) {
+let soundObject = function(audio, amplitude, pan, coordinates, active) {
     this.audio = audio;
-    this.audioName = audioName;
     this.amplitude = amplitude;
     this.pan = pan;
     this.coordinates = coordinates;
@@ -219,15 +188,8 @@ let audioObject = function(audio, audioName, amplitude, pan, coordinates, active
 };
 
 
-audioObjects["grandfatherClock"] = new audioObject(grandfatherClock, "grandfatherClock", .5, -1, [-1, 0], true);
-audioObjects["waterDrops"] = new audioObject(waterDrops, "waterDrops", .5, 1, [1, 0], true);
-
-
-
-
-
-
-
+sounds["grandfatherClock"] = new soundObject(grandfatherClock, .5, -1, [-1, 0], true);
+sounds["waterDrops"] = new soundObject(waterDrops, .5, 1, [1, 0], true);
 
 
 
@@ -247,7 +209,7 @@ let Room = function(name, descriptions, descriptionIndex, keyRoomDict, inputVisi
 
 // last description is the delayed description
 
-rooms["prologue"] = new Room("prologue", ["It is pitch black.", "Do you have the time?"], 0, { eight: "firstRoomMiddle" }, false, true, "grandfatherClock", [0, 0], [0]);
+rooms["prologue"] = new Room("prologue", ["It is pitch black.", "Do you have the time?"], 0, { eight: "firstRoomMiddle" }, true, true, "grandfatherClock", [0, 0], [0]);
 
 
 
@@ -259,36 +221,29 @@ rooms["firstRoomMiddle"] = new Room(
 // NORTH
 rooms["firstRoomNorth"] = new Room(
     "firstRoomNorth", ["n Which way should you move?"],
-    0, { north: "You walk north but collide head-first into what feels like a door... ouch", south: "firstRoomMiddle", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, 1], []);
+    0, { north: "(n) You walk north but collide head-first into what feels like a door... ouch", south: "firstRoomMiddle", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, 1], []);
 
 
 
 // SOUTH
 rooms["firstRoomSouth"] = new Room(
     "firstRoomSouth", ["(s) Which way should you move?"],
-    0, { north: "firstRoomMiddle", south: "You walk south but are obstructed by some sort of furniture...", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, -1], []);
+    0, { north: "firstRoomMiddle", south: "(s) You walk south but are obstructed by some sort of furniture...", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, -1], []);
 
 
 
 // EAST
 rooms["firstRoomEast"] = new Room(
     "firstRoomEast", ["(e) Which way should you move?"],
-    0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "There's some sort of device in your way.", west: "firstRoomMiddle" }, true, true, "waterDrops", [1, 0], []);
+    0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "(e) There's some sort of device in your way.", west: "firstRoomMiddle" }, true, true, "waterDrops", [1, 0], []);
 
 
 
 // WEST
 rooms["firstRoomWest"] = new Room(
     "firstRoomWest", ["((w) Which way should you move?"],
-    0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "firstRoomMiddle", west: "There's a metal structure running along the wall." }, true, true, "waterDrops", [-1, 0], []);
+    0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "firstRoomMiddle", west: "(w) There's a metal structure running along the wall." }, true, true, "waterDrops", [-1, 0], []);
 
 // ================================================================================================
 
 var currentRoom = rooms["prologue"];
-var audioBuffer = audioObjects["grandfatherClock"];
-
-
-
-
-
-
