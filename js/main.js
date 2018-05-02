@@ -12,10 +12,10 @@ var logHistoryArray = [];
 var rooms = [];
 var audioObjects = [];
 
-var grandfatherClock = new Audio("audio/grandfather_clock.wav");
-grandfatherClock.load();
-var waterDrops = new Audio("audio/water_drops.wav");
-waterDrops.load();
+
+var grandfatherClock = loadSound("audio/grandfather_clock.wav");
+var waterDrops = loadSound("audio/water_drops.wav");
+
 
 
 // PROCESS USER INPUT =============================================================================
@@ -185,14 +185,14 @@ function playAudio(audioIn) {
     }
 
 
-    // runs audioEndedFunction when audio has ended
-    currentRoom.audio.addEventListener('ended', function() {
-        console.log(audioIn.audioName + " ended")
-        // print last description in array
-        printToLog(currentRoom.descriptions[currentRoom.descriptions.length - 1])
-        // if the input is invisible make it visible
-        inputVisible(true);
-    })
+    // // runs audioEndedFunction when audio has ended
+    // audioIn.audio.addEventListener('ended', function() {
+    //     console.log(audioIn.audioName + " ended")
+    //     // print last description in array
+    //     printToLog(currentRoom.descriptions[currentRoom.descriptions.length - 1])
+    //     // if the input is invisible make it visible
+    //     inputVisible(true);
+    // })
 }
 
 // ================================================================================================
@@ -219,8 +219,8 @@ let audioObject = function(audio, audioName, amplitude, pan, coordinates, active
 };
 
 
-audioObjects[grandfatherClock] = new Audio(grandfatherClock, "grandfatherClock", .5, -1, [-1, 0], true);
-audioObjects[waterDrops] = new Audio(waterDrops, "waterDrops", .5, 1, [1, 0], true);
+audioObjects["grandfatherClock"] = new audioObject(grandfatherClock, "grandfatherClock", .5, -1, [-1, 0], true);
+audioObjects["waterDrops"] = new audioObject(waterDrops, "waterDrops", .5, 1, [1, 0], true);
 
 
 
@@ -286,3 +286,9 @@ rooms["firstRoomWest"] = new Room(
 
 var currentRoom = rooms["prologue"];
 var audioBuffer = audioObjects["grandfatherClock"];
+
+
+
+
+
+
