@@ -14,14 +14,56 @@ var logArray = [];
 var logHistoryArray = [];
 var rooms = [];
 var sounds = [];
+var audioId = [];
 
-var grandfatherClock;
-var waterDrops;
+
+var waterDrops = new Howl({
+    src: ['audio/waterDrops.mp3'],
+    loop: true,
+    volume: 0.5,
+});
+
+var snoring = new Howl({
+    src: ['audio/snoring.mp3'],
+    loop: true,
+    volume: 0.2,
+});
+
+var snoreWakeUp = new Howl({
+    src: ['audio/snoreWakeUp.mp3'],
+    loop: false,
+    volume: 0.2,
+});
+
+var hitWithClub = new Howl({
+    src: ['audio/hitWithClub.mp3'],
+    loop: false,
+    volume: 0.5,
+});
+
+var radioStatic = new Howl({
+    src: ['audio/radioStatic.mp3'],
+    loop: true,
+    volume: 0.7,
+});
+
+var footSteps = new Howl({
+    src: ['audio/footSteps.mp3'],
+    loop: false,
+    volume: 0.5,
+});
+
+var footStepsInWater = new Howl({
+    src: ['audio/footStepsInWater.mp3'],
+    loop: false,
+    volume: 0.2,
+});
+
 var currentAudio;
-var previousAudio;
+var previousVolume;
+var previousRoom = "se";
+var behindAttenuator
 var hasPlayed = false;
-
-
 
 
 
@@ -76,6 +118,8 @@ function processUserInput() {
                         processRoomAttributes();
                         // print new room description to log
                         printToLog(currentRoom.descriptions[currentRoom.descriptionIndex]);
+                        // playCurrentRoomAudio
+                        playCurrentRoomAudio();
                         return;
                     }
                     // If the key returns an undefined value
@@ -108,12 +152,18 @@ function processUserInput() {
 // PARSER =========================================================================================
 
 function parser(userInput) {
-    userInput = userInput.replace("8", "eight")
+    userInput = userInput.replace("n", "north");
+    userInput = userInput.replace("s", "south");
+    userInput = userInput.replace("e", "east");
+    userInput = userInput.replace("w", "west");
     userInput = userInput.replace("history", "h");
     return userInput;
 }
 
 // ================================================================================================
+
+
+
 
 
 // PROCESS ROOM ATTRIBUTES ========================================================================
@@ -122,8 +172,23 @@ function processRoomAttributes() {
 
     // check the inputVisible attribute of the current room
     inputVisible(currentRoom.inputVisible);
-}
+
+//     if (currentRoom.name == "ne") {
+//         sounds["snoring"].active = false;
+//         sounds["snoreWakeUp"].active = true;
+//     }
+//     else {
+//         sounds["snoring"].active = true;
+//         sounds["snoreWakeUp"].active = false;
+//     }
+    }
+
+
+
 // ================================================================================================
+
+
+
 
 
 // INPUT VISIBLE ==================================================================================
@@ -139,6 +204,10 @@ function inputVisible(visibility) {
     }
 }
 // ================================================================================================
+
+
+
+
 
 
 // PRINT TO LOG ===================================================================================
@@ -161,6 +230,9 @@ function printToLog(textToPrint) {
 
 
 
+
+
+
 // PRINT LOG  HISTORY =============================================================================
 
 function printLogHistory() {
@@ -177,25 +249,138 @@ function printLogHistory() {
 
 
 
-// AUDIO OBJECT =====================================================================================
+// AUDIO OBJECT ===================================================================================
 
-let soundObject = function(audio, amplitude, pan, coordinates, active) {
+function playCurrentRoomAudio() {
+
+    if (previousRoom != currentRoom.name) {
+        footStepsInWater.play();
+        previousRoom = currentRoom.name;
+    }
+
+
+    for (var i = 0; i < currentRoom.audioObject.length-1; i++) {
+        
+        console.log(sounds[currentRoom.audioObject[i]]);
+        console.log(currentRoom);
+
+        if ((!sounds[currentRoom.audioObject[i]].audio[0].playing(audioId[i]))) {
+            audioId[i] = sounds[currentRoom.audioObject[i]].audio[0].play();
+            console.log("Playing: " + currentRoom.audioObject[i]);
+        }
+
+        // stop audio if audio.active is false
+        if (!sounds[currentRoom.audioObject[i]].active) {
+            console.log("audio should stop");
+            sounds[currentRoom.audioObject[i]].audio[0].stop(audioId[i]);
+        }
+
+
+        // PANNING  ===============================================================================
+
+        // angle between player and soundsource in degrees
+        var angleDeg = Math.atan2(sounds[currentRoom.audioObject[i]].coordinates[1] - currentRoom.coordinates[1], sounds[currentRoom.audioObject[i]].coordinates[0] - currentRoom.coordinates[0]) * 180 / Math.PI;
+
+        console.log(angleDeg);
+
+        // at 1 unless sound is behind.
+        behindAttenuator = 1;
+
+        // make all values positive
+        if (angleDeg < 0) {
+            behindAttenuator = 1.2;
+            angleDeg = angleDeg * -1;
+        }
+
+        // scaling 0-180 degrees to minus1 - 1 to satisfy requirements of stereo function.
+        var scaledPan = 2 / 180 * angleDeg;
+        scaledPan = scaledPan - 1;
+        scaledPan = scaledPan * -1;
+
+        sounds[currentRoom.audioObject[i]].audio[0].stereo(scaledPan, audioId[i]);
+
+        // ========================================================================================
+
+
+
+
+
+        // VOLUME  ================================================================================
+
+        var distanceToSound = Math.sqrt(Math.pow(sounds[currentRoom.audioObject[i]].coordinates[0] - currentRoom.coordinates[0], 2) + Math.pow(sounds[currentRoom.audioObject[i]].coordinates[1] - currentRoom.coordinates[1], 2));
+
+        // mapping distance values to a unit scale with logarithmic spacing 
+        var scaledVolume = Math.log(1 + distanceToSound) / Math.log(1 + 20);
+
+        scaledVolume = scaledVolume * behindAttenuator;
+
+        // if there is no previous volume
+        if (isNaN(previousVolume)) {
+            previousVolume = (1 - scaledVolume);
+        }
+
+        // adjusting volume for distance between sound and player over two seconds
+        sounds[currentRoom.audioObject[i]].audio[0].fade(previousVolume, (1 - scaledVolume), 2200, audioId[i]);
+
+        // remember volume
+        previousVolume = (1 - scaledVolume);
+
+
+
+        //ONENDAUDIO 
+
+        // if an audio object has an onendAudio value
+        if (sounds[currentRoom.audioObject[i]].audio.length > 1) {
+            
+            console.log(sounds[currentRoom.audioObject[i]]);
+            
+            // when the audio of the object finishes playing
+            sounds[currentRoom.audioObject[i]].audio[0].on('end', function() {
+            
+                this[1].play();
+
+            }, audioId[i]);
+        }
+    }
+}
+
+
+
+// ================================================================================================
+
+
+
+
+
+
+
+
+// AUDIO OBJECT ===================================================================================
+
+let soundObject = function(audio, coordinates, active) {
     this.audio = audio;
-    this.amplitude = amplitude;
-    this.pan = pan;
     this.coordinates = coordinates;
     this.active = active;
 };
 
+sounds["waterDrops"] = new soundObject([waterDrops], [20, 15], true);
+sounds["snoring"] = new soundObject([snoring], [8, 28], true);
+sounds["snoreWakeUp"] = new soundObject([snoreWakeUp] [8, 28], false);
+sounds["radioStatic"] = new soundObject([radioStatic], [8, 29], true);
 
-sounds["grandfatherClock"] = new soundObject(grandfatherClock, .5, -1, [-1, 0], true);
-sounds["waterDrops"] = new soundObject(waterDrops, .5, 1, [1, 0], true);
+// ================================================================================================
 
 
 
-// ROOM OBJECT =====================================================================================
 
-let Room = function(name, descriptions, descriptionIndex, keyRoomDict, inputVisible, inputVisibleAfterDelay, audioObject, displayDelayedDescription, coordinates, interactableItems) {
+
+
+
+
+
+// ROOM OBJECT ====================================================================================
+
+let Room = function(name, descriptions, descriptionIndex, keyRoomDict, inputVisible, inputVisibleAfterDelay, audioObject, coordinates, interactableItems) {
     this.name = name;
     this.descriptions = descriptions;
     this.descriptionIndex = descriptionIndex;
@@ -209,41 +394,38 @@ let Room = function(name, descriptions, descriptionIndex, keyRoomDict, inputVisi
 
 // last description is the delayed description
 
-rooms["prologue"] = new Room("prologue", ["It is pitch black.", "Do you have the time?"], 0, { eight: "firstRoomMiddle" }, true, true, "grandfatherClock", [0, 0], [0]);
+// rooms["prologue"] = new Room("prologue", ["It is pitch black.", "Do you have the time?"], 0, { eight: "firstRoomMiddle" }, true, true, "grandfatherClock", [0, 0], [0]);
 
 
 
-// MIDDLE 
-rooms["firstRoomMiddle"] = new Room(
-    "firstRoomMiddle", ["(m) The ground is completely soaked. There's about an inch of water and its freezing.", "Which way should you move?"], 0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, 0], []);
 
+rooms["se"] = new Room(
+    "se", ["It is pitch-black..."], 0, { north: "e", south: "wall", east: "wall", west: "sw" }, true, true, ["waterDrops", "snoring", "radioStatic"], [15, 5], []);
 
-// NORTH
-rooms["firstRoomNorth"] = new Room(
-    "firstRoomNorth", ["n Which way should you move?"],
-    0, { north: "(n) You walk north but collide head-first into what feels like a door... ouch", south: "firstRoomMiddle", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, 1], []);
+rooms["e"] = new Room(
+    "e", ["It is pitch-black..."],
+    0, { north: "ne", south: "se", east: "wall", west: "w" }, true, true, ["waterDrops", "snoring", "radioStatic"], [15, 15], []);
 
+rooms["ne"] = new Room(
+    "ne", ["It is pitch-black..."],
+    0, { north: "wall", south: "e", east: "wall", west: "nw" }, true, true, ["waterDrops", "snoring", "snoreWakeUp", "radioStatic"], [15, 25], []);
 
+rooms["nw"] = new Room(
+    "nw", ["It is pitch-black..."],
+    0, { north: "wall", south: "w", east: "ne", west: "wall" }, true, true, ["waterDrops", "snoring", "radioStatic"], [5, 25], []);
 
-// SOUTH
-rooms["firstRoomSouth"] = new Room(
-    "firstRoomSouth", ["(s) Which way should you move?"],
-    0, { north: "firstRoomMiddle", south: "(s) You walk south but are obstructed by some sort of furniture...", east: "firstRoomEast", west: "firstRoomWest" }, true, true, "waterDrops", [0, -1], []);
+rooms["w"] = new Room(
+    "w", ["It is pitch-black..."],
+    0, { north: "nw", south: "sw", east: "e", west: "wall" }, true, true, ["waterDrops", "snoring", "radioStatic"], [5, 15], []);
 
+rooms["sw"] = new Room(
+    "sw", ["It is pitch-black..."],
+    0, { north: "w", south: "wall", east: "se", west: "wall" }, true, true, ["waterDrops", "snoring", "radioStatic"], [5, 5], []);
 
-
-// EAST
-rooms["firstRoomEast"] = new Room(
-    "firstRoomEast", ["(e) Which way should you move?"],
-    0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "(e) There's some sort of device in your way.", west: "firstRoomMiddle" }, true, true, "waterDrops", [1, 0], []);
-
-
-
-// WEST
-rooms["firstRoomWest"] = new Room(
-    "firstRoomWest", ["((w) Which way should you move?"],
-    0, { north: "firstRoomNorth", south: "firstRoomSouth", east: "firstRoomMiddle", west: "(w) There's a metal structure running along the wall." }, true, true, "waterDrops", [-1, 0], []);
+rooms["unconscious"] = new Room(
+    "sw", ["You are unconscious..."],
+    0, { restart: "se" }, true, true, [], [5, 5], []);
 
 // ================================================================================================
 
-var currentRoom = rooms["prologue"];
+var currentRoom = rooms["se"];

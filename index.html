@@ -13,19 +13,14 @@
     <!--jquery-->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     
-    <!--p5 Library-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.js"></script>
     
-    <!--p5.js-sound-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.sound.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.dom.min.js"></script>
+    <!--Howler-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.10/howler.min.js"></script>
     
     <!--main js sheet-->
     <script src="js/main.js"></script>
     
-    <!--audio js sheet-->
-    <script src="js/audio.js"></script>
+    
     
     <!--style sheet-->
     <link rel="stylesheet" href="css/style.css" type="text/css" />
@@ -35,7 +30,7 @@
 
 
 
-<body onload="printToLog(currentRoom.descriptions[0]); inputVisible(currentRoom.inputVisible); preload(); setup(); draw()">
+<body onload="printToLog(currentRoom.descriptions[0]); inputVisible(currentRoom.inputVisible);  playCurrentRoomAudio()">
 
     <div class="container">
 
