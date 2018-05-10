@@ -1,3 +1,5 @@
+'use strict';
+
 // IMPLEMENT TESTING ON USERINPUT
 // use jquery
 // build inventory
@@ -5,58 +7,62 @@
 // create item class
 // create audio engine
 // fix history
-// build audio objects
+// fix parsing
+
+// restart function
 
 // HOW TO IMPLEMENT JASMINE - wroks best for functions that return something. parser, printTo Log
 // HOW TO SORT OUT LOADSOUND
 
 var logArray = [];
 var logHistoryArray = [];
+var verbs = [];
 var rooms = [];
 var sounds = [];
 var audioId = [];
+var directionNouns = ["north", "south", "east", "west"];
 
 
 var waterDrops = new Howl({
     src: ['audio/waterDrops.mp3'],
     loop: true,
-    volume: 0.5,
+    volume: 0.3
 });
 
 var snoring = new Howl({
     src: ['audio/snoring.mp3'],
     loop: true,
-    volume: 0.2,
+    volume: 0.2
 });
 
 var snoreWakeUp = new Howl({
     src: ['audio/snoreWakeUp.mp3'],
     loop: false,
-    volume: 0.2,
+    volume: 0.8
 });
 
 var hitWithClub = new Howl({
     src: ['audio/hitWithClub.mp3'],
     loop: false,
-    volume: 0.5,
+    volume: 0.5
 });
 
 var radioStatic = new Howl({
     src: ['audio/radioStatic.mp3'],
     loop: true,
-    volume: 0.7,
+    volume: 0.7
 });
 
 var footSteps = new Howl({
     src: ['audio/footSteps.mp3'],
     loop: false,
-    volume: 0.5,
+    volume: 0.5
 });
 
 var footStepsInWater = new Howl({
     src: ['audio/footStepsInWater.mp3'],
     loop: false,
-    volume: 0.2,
+    volume: 0.2
 });
 
 var currentAudio;
@@ -64,6 +70,106 @@ var previousVolume;
 var previousRoom = "se";
 var behindAttenuator
 var hasPlayed = false;
+
+
+
+// UNCONSCIOUS ====================================================================================
+
+function unconscious() {
+    hitWithClub.play();
+    for (var j = 0; j < currentRoom.audioObject.length; j++) {
+        sounds[currentRoom.audioObject[j]].audio[0].mute(true);
+    }
+    printToLog("You are unconscious...\n\nType 'restart' to play again")
+}
+//  ===============================================================================================
+
+
+
+
+
+// VERB FUNCTIONS  ================================================================================
+
+function go(directionNoun) {
+
+    // if the direction noun is a valid direction noun
+    if (directionNouns.indexOf(directionNoun) >= 0) {
+
+
+        console.log(currentRoom.keyRoomDict[directionNoun]);
+        console.log(rooms);
+        console.log(rooms.indexOf(currentRoom.keyRoomDict[directionNoun]));
+
+        // if the directionNoun returns a room
+
+        // this condition should evaluate to true if the key returns a room value
+        if (rooms[currentRoom.keyRoomDict[directionNoun]] instanceof Object) {
+
+            // add the current log to the logHistoryArray
+            logHistoryArray = logHistoryArray.concat(logArray);
+            // empty the log
+            logArray = [];
+
+            // change current room
+            currentRoom = rooms[currentRoom.keyRoomDict[directionNoun]];
+
+            // process room attributes
+            processRoomAttributes();
+
+            // print new room description to log
+            printToLog(currentRoom.descriptions[currentRoom.descriptionIndex]);
+
+            // playCurrentRoomAudio
+            playCurrentRoomAudio();
+
+        }
+
+        else {
+            // print the value associated with the key
+            printToLog(currentRoom.keyRoomDict[directionNoun]);
+            return;
+        }
+    }
+    // if the directionNoun is not a valid direction
+    else {
+        printToLog("You must specify a valid direction ('n', 's', 'e', 'w')");
+    }
+    return;
+}
+//  ===============================================================================================
+
+
+
+
+
+
+
+
+// VERB OBJECTS  ==================================================================================
+
+// ## GO ##
+
+let verb = function(verbName, process) {
+    this.verbName = verbName;
+    this.process = function(directionNoun) {
+        go(directionNoun)
+    };
+};
+let verb1 = new verb("go", go);
+verbs.push(verb1);
+
+//  ===============================================================================================
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -78,70 +184,38 @@ function processUserInput() {
     // check that user has inputted something
     if (userInput != "") {
 
-        // print userInput in console
-        printToLog(userInput);
+        // // print userInput in console
+        // printToLog(userInput);
 
         // parse userInput
         userInput = parser(userInput);
-        console.log("userInput parsed: " + userInput);
-
-        // print history
-        if (userInput == "h") {
-            printLogHistory();
-            return;
-        }
 
         // split userInput into words
         var userInputWords = userInput.split(" ");
 
-        // iterate through words in userInput
-        for (var i = 0; i < userInputWords.length; i++)
-            // if the word is a key of the keyRoomDict
-            if (currentRoom.keyRoomDict[userInputWords[i]]) {
-                console.log(currentRoom.keyRoomDict[userInputWords[i]]);
+        // for every valid verb
+        for (var i = 0; i < verbs.length; i++) {
 
-                // add the current log to the logHistoryArray
-                logHistoryArray = logHistoryArray.concat(logArray);
-                // empty the log
-                logArray = [];
+            // if the user's first word is a valid verb
+            if (userInputWords[0] == verbs[i].verbName) {
 
-                // if the keyValue is a word
-                if (isNaN(currentRoom.keyRoomDict[userInputWords[i]] * 1)) {
-
-                    // this condition should evaluate to true if the key returns a room value
-                    if (rooms[currentRoom.keyRoomDict[userInputWords[i]]] instanceof Object) {
-                        // change currentRoom
-                        console.log(typeof(rooms[currentRoom.keyRoomDict[userInputWords[i]]]));
-                        currentRoom = rooms[currentRoom.keyRoomDict[userInputWords[i]]];
-                        console.log("Current Room: " + currentRoom.name);
-                        // process room attributes
-                        processRoomAttributes();
-                        // print new room description to log
-                        printToLog(currentRoom.descriptions[currentRoom.descriptionIndex]);
-                        // playCurrentRoomAudio
-                        playCurrentRoomAudio();
-                        return;
-                    }
-                    // If the key returns an undefined value
-                    else {
-                        // print the value associated with the key
-                        printToLog(currentRoom.keyRoomDict[userInputWords[i]]);
-                        return;
-                    }
+                // check that the user has given a second word
+                if (userInputWords.length > 1) {
+                    // input the second word to the verb function
+                    verbs[i].process(userInputWords[1]);
                 }
-                // if the keyValue is a number
                 else {
-                    currentRoom.descriptionIndex = currentRoom.keyRoomDict[userInputWords[i]];
-                    currentRoom.playAudio = false;
-                    printToLog(currentRoom.descriptions[currentRoom.descriptionIndex]);
-                    return;
+                    printToLog("You must provide a second word when using " + userInputWords[0]);
                 }
             }
-        // return message when userInput does not contain keyString
-        printToLog("Nothing happens...");
+            else {
+                printToLog("First word should be a verb");
+            }
+        }
     }
+    // if the user has not inputted anything
     else {
-        console.log("Empty userInput")
+        printToLog("Empty userInput")
     }
 }
 // ================================================================================================
@@ -173,18 +247,18 @@ function processRoomAttributes() {
     // check the inputVisible attribute of the current room
     inputVisible(currentRoom.inputVisible);
 
-//     if (currentRoom.name == "ne") {
-//         sounds["snoring"].active = false;
-//         sounds["snoreWakeUp"].active = true;
-//     }
-//     else {
-//         sounds["snoring"].active = true;
-//         sounds["snoreWakeUp"].active = false;
-//     }
+
+
+    // When in NE
+    if (currentRoom.name == "ne") {
+        sounds["snoring"].active = false;
+        sounds["snoreWakeUp"].active = true;
     }
-
-
-
+    else {
+        sounds["snoring"].active = true;
+        sounds["snoreWakeUp"].active = false;
+    }
+}
 // ================================================================================================
 
 
@@ -194,7 +268,6 @@ function processRoomAttributes() {
 // INPUT VISIBLE ==================================================================================
 
 function inputVisible(visibility) {
-    console.log("checked visibility")
     if (visibility == false) {
         document.getElementById("userInput").style.visibility = 'hidden';
     }
@@ -218,7 +291,6 @@ function printToLog(textToPrint) {
     logArray.push(textToPrint);
     // print log
     document.getElementById("console").innerHTML = logArray.join("\n");
-    console.log("printed to log")
 
     // // keep scroll bar at bottom
     // var textarea = document.getElementById("console");
@@ -241,7 +313,6 @@ function printLogHistory() {
     document.getElementById("console").reset();
     document.getElementById("console").innerHTML += "\nLog history: " + (logHistoryArray.join("\n")) + "\n" +
         currentRoom.descriptions[currentRoom.descriptionIndex];
-    console.log("printed log history")
 }
 // ================================================================================================
 
@@ -249,7 +320,7 @@ function printLogHistory() {
 
 
 
-// AUDIO OBJECT ===================================================================================
+// AUDIO ENGINE ===================================================================================
 
 function playCurrentRoomAudio() {
 
@@ -259,29 +330,26 @@ function playCurrentRoomAudio() {
     }
 
 
-    for (var i = 0; i < currentRoom.audioObject.length-1; i++) {
-        
-        console.log(sounds[currentRoom.audioObject[i]]);
-        console.log(currentRoom);
+    for (var i = 0; i < currentRoom.audioObject.length; i++) {
 
         if ((!sounds[currentRoom.audioObject[i]].audio[0].playing(audioId[i]))) {
             audioId[i] = sounds[currentRoom.audioObject[i]].audio[0].play();
-            console.log("Playing: " + currentRoom.audioObject[i]);
         }
 
         // stop audio if audio.active is false
         if (!sounds[currentRoom.audioObject[i]].active) {
-            console.log("audio should stop");
             sounds[currentRoom.audioObject[i]].audio[0].stop(audioId[i]);
         }
+
+
+
+
 
 
         // PANNING  ===============================================================================
 
         // angle between player and soundsource in degrees
         var angleDeg = Math.atan2(sounds[currentRoom.audioObject[i]].coordinates[1] - currentRoom.coordinates[1], sounds[currentRoom.audioObject[i]].coordinates[0] - currentRoom.coordinates[0]) * 180 / Math.PI;
-
-        console.log(angleDeg);
 
         // at 1 unless sound is behind.
         behindAttenuator = 1;
@@ -326,25 +394,20 @@ function playCurrentRoomAudio() {
         previousVolume = (1 - scaledVolume);
 
 
-
         //ONENDAUDIO 
 
         // if an audio object has an onendAudio value
         if (sounds[currentRoom.audioObject[i]].audio.length > 1) {
-            
-            console.log(sounds[currentRoom.audioObject[i]]);
-            
+
             // when the audio of the object finishes playing
             sounds[currentRoom.audioObject[i]].audio[0].on('end', function() {
-            
-                this[1].play();
-
+                if (this == snoreWakeUp) {
+                    unconscious();
+                }
             }, audioId[i]);
         }
     }
 }
-
-
 
 // ================================================================================================
 
@@ -365,7 +428,7 @@ let soundObject = function(audio, coordinates, active) {
 
 sounds["waterDrops"] = new soundObject([waterDrops], [20, 15], true);
 sounds["snoring"] = new soundObject([snoring], [8, 28], true);
-sounds["snoreWakeUp"] = new soundObject([snoreWakeUp] [8, 28], false);
+sounds["snoreWakeUp"] = new soundObject([snoreWakeUp, hitWithClub], [8, 28], false);
 sounds["radioStatic"] = new soundObject([radioStatic], [8, 29], true);
 
 // ================================================================================================
@@ -408,7 +471,7 @@ rooms["e"] = new Room(
 
 rooms["ne"] = new Room(
     "ne", ["It is pitch-black..."],
-    0, { north: "wall", south: "e", east: "wall", west: "nw" }, true, true, ["waterDrops", "snoring", "snoreWakeUp", "radioStatic"], [15, 25], []);
+    0, { north: "wall", south: "e", east: "wall", west: "nw" }, true, true, ["waterDrops", "snoring", "radioStatic", "snoreWakeUp"], [15, 25], []);
 
 rooms["nw"] = new Room(
     "nw", ["It is pitch-black..."],
