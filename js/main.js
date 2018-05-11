@@ -8,25 +8,26 @@
 // create audio engine
 // fix history
 // fix parsing
+// make all objects the same (push problem)
 
 // restart function
 
 // HOW TO IMPLEMENT JASMINE - wroks best for functions that return something. parser, printTo Log
 // HOW TO SORT OUT LOADSOUND
 
-var logArray = [];
-var logHistoryArray = [];
-var verbs = [];
-var rooms = [];
-var sounds = [];
-var audioId = [];
-var directionNouns = ["north", "south", "east", "west"];
 
+// AUDIO FILES ====================================================================================
 
 var waterDrops = new Howl({
     src: ['audio/waterDrops.mp3'],
     loop: true,
-    volume: 0.3
+    volume: 0.1
+});
+
+var waterDropsOff = new Howl({
+    src: ['audio/waterDropsOff.mp3'],
+    loop: false,
+    volume: 0.4
 });
 
 var snoring = new Howl({
@@ -65,10 +66,22 @@ var footStepsInWater = new Howl({
     volume: 0.2
 });
 
+//  ===============================================================================================
+
+
+var logArray = [];
+var logHistoryArray = [];
+var verbs = [];
+var items = [];
+var rooms = [];
+var sounds = [];
+var audioId = [];
+var directionNouns = ["NORTH", "SOUTH", "EAST", "WEST"];
 var currentAudio;
 var previousVolume;
+var groundWet = true;
 var previousRoom = "se";
-var behindAttenuator
+var behindAttenuator;
 var hasPlayed = false;
 
 
@@ -77,8 +90,8 @@ var hasPlayed = false;
 
 function unconscious() {
     hitWithClub.play();
-    for (var j = 0; j < currentRoom.audioObject.length; j++) {
-        sounds[currentRoom.audioObject[j]].audio[0].mute(true);
+    for (var i = 0; i < currentRoom.audioObject.length; i++) {
+        sounds[currentRoom.audioObject[i]].audio[0].mute(true);
     }
     printToLog("You are unconscious...\n\nType 'restart' to play again")
 }
@@ -86,339 +99,66 @@ function unconscious() {
 
 
 
+// TAP FUNCTION ===================================================================================
 
+function tapFunction(direction) {
 
-// VERB FUNCTIONS  ================================================================================
+    // if turned anticlockwise
+    if (direction == "anticlockwise") {
 
-function go(directionNoun) {
-
-    // if the direction noun is a valid direction noun
-    if (directionNouns.indexOf(directionNoun) >= 0) {
-
-
-        console.log(currentRoom.keyRoomDict[directionNoun]);
-        console.log(rooms);
-        console.log(rooms.indexOf(currentRoom.keyRoomDict[directionNoun]));
-
-        // if the directionNoun returns a room
-
-        // this condition should evaluate to true if the key returns a room value
-        if (rooms[currentRoom.keyRoomDict[directionNoun]] instanceof Object) {
-
-            // add the current log to the logHistoryArray
-            logHistoryArray = logHistoryArray.concat(logArray);
-            // empty the log
-            logArray = [];
-
-            // change current room
-            currentRoom = rooms[currentRoom.keyRoomDict[directionNoun]];
-
-            // process room attributes
-            processRoomAttributes();
-
-            // print new room description to log
-            printToLog(currentRoom.descriptions[currentRoom.descriptionIndex]);
-
-            // playCurrentRoomAudio
-            playCurrentRoomAudio();
-
+        if (sounds["waterDrops"].active) {
+            // water drops sound should stop
+            sounds["waterDrops"].active = false;
+            // tap is off
+            tap.on = false;
+            sounds["waterDropsOff"].active = true;
+        } else {
+            printToLog("nothing happens.")
         }
 
-        else {
-            // print the value associated with the key
-            printToLog(currentRoom.keyRoomDict[directionNoun]);
-            return;
-        }
     }
-    // if the directionNoun is not a valid direction
     else {
-        printToLog("You must specify a valid direction ('n', 's', 'e', 'w')");
+        if (!sounds["waterDrops"].active) {
+            // water drops sound should stop
+            sounds["waterDrops"].active = true;
+            // tap is off
+            tap.on = true;
+            sounds["waterDropsOff"].active = false;
+        } else {
+            printToLog("Nothing happens.")
+        }
     }
+    // playCurrentRoomAudio
+    playCurrentRoomAudio();
     return;
 }
 //  ===============================================================================================
 
 
+// SLEEP ===================================================================================
 
+function sleep() {
 
+    console.log("hello");
 
+    if(tap.on == false) {
+        groundWet = false;
+    } else {
+        groundWet = true;
+    }
+    
+    for(var i = 0; i < sounds.length; i ++) {
+        console.log(sounds[i].audio.volume());
+        sounds[i].audio.fade(sounds[i].audio.volume(), 0, 5000);
+    }
+    
 
-
-
-// VERB OBJECTS  ==================================================================================
-
-// ## GO ##
-
-let verb = function(verbName, process) {
-    this.verbName = verbName;
-    this.process = function(directionNoun) {
-        go(directionNoun)
-    };
-};
-let verb1 = new verb("go", go);
-verbs.push(verb1);
-
+    return;
+}
 //  ===============================================================================================
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// PROCESS USER INPUT =============================================================================
-
-function processUserInput() {
-
-    // userInput is made into lower case
-    var userInput = document.getElementById("userInput").value.toLowerCase();
-
-    // check that user has inputted something
-    if (userInput != "") {
-
-        // // print userInput in console
-        // printToLog(userInput);
-
-        // parse userInput
-        userInput = parser(userInput);
-
-        // split userInput into words
-        var userInputWords = userInput.split(" ");
-
-        // for every valid verb
-        for (var i = 0; i < verbs.length; i++) {
-
-            // if the user's first word is a valid verb
-            if (userInputWords[0] == verbs[i].verbName) {
-
-                // check that the user has given a second word
-                if (userInputWords.length > 1) {
-                    // input the second word to the verb function
-                    verbs[i].process(userInputWords[1]);
-                }
-                else {
-                    printToLog("You must provide a second word when using " + userInputWords[0]);
-                }
-            }
-            else {
-                printToLog("First word should be a verb");
-            }
-        }
-    }
-    // if the user has not inputted anything
-    else {
-        printToLog("Empty userInput")
-    }
-}
-// ================================================================================================
-
-
-
-
-// PARSER =========================================================================================
-
-function parser(userInput) {
-    userInput = userInput.replace("n", "north");
-    userInput = userInput.replace("s", "south");
-    userInput = userInput.replace("e", "east");
-    userInput = userInput.replace("w", "west");
-    userInput = userInput.replace("history", "h");
-    return userInput;
-}
-
-// ================================================================================================
-
-
-
-
-
-// PROCESS ROOM ATTRIBUTES ========================================================================
-
-function processRoomAttributes() {
-
-    // check the inputVisible attribute of the current room
-    inputVisible(currentRoom.inputVisible);
-
-
-
-    // When in NE
-    if (currentRoom.name == "ne") {
-        sounds["snoring"].active = false;
-        sounds["snoreWakeUp"].active = true;
-    }
-    else {
-        sounds["snoring"].active = true;
-        sounds["snoreWakeUp"].active = false;
-    }
-}
-// ================================================================================================
-
-
-
-
-
-// INPUT VISIBLE ==================================================================================
-
-function inputVisible(visibility) {
-    if (visibility == false) {
-        document.getElementById("userInput").style.visibility = 'hidden';
-    }
-    if (visibility == true) {
-        document.getElementById("userInput").style.visibility = 'visible';
-        document.getElementById("userInput").focus();
-    }
-}
-// ================================================================================================
-
-
-
-
-
-
-// PRINT TO LOG ===================================================================================
-
-function printToLog(textToPrint) {
-
-    // add input to log
-    logArray.push(textToPrint);
-    // print log
-    document.getElementById("console").innerHTML = logArray.join("\n");
-
-    // // keep scroll bar at bottom
-    // var textarea = document.getElementById("console");
-    // if (textarea != null) {
-    //     textarea.scrollTop = textarea.scrollHeight;
-    // }
-}
-// ================================================================================================
-
-
-
-
-
-
-// PRINT LOG  HISTORY =============================================================================
-
-function printLogHistory() {
-
-    // print log
-    document.getElementById("console").reset();
-    document.getElementById("console").innerHTML += "\nLog history: " + (logHistoryArray.join("\n")) + "\n" +
-        currentRoom.descriptions[currentRoom.descriptionIndex];
-}
-// ================================================================================================
-
-
-
-
-
-// AUDIO ENGINE ===================================================================================
-
-function playCurrentRoomAudio() {
-
-    if (previousRoom != currentRoom.name) {
-        footStepsInWater.play();
-        previousRoom = currentRoom.name;
-    }
-
-
-    for (var i = 0; i < currentRoom.audioObject.length; i++) {
-
-        if ((!sounds[currentRoom.audioObject[i]].audio[0].playing(audioId[i]))) {
-            audioId[i] = sounds[currentRoom.audioObject[i]].audio[0].play();
-        }
-
-        // stop audio if audio.active is false
-        if (!sounds[currentRoom.audioObject[i]].active) {
-            sounds[currentRoom.audioObject[i]].audio[0].stop(audioId[i]);
-        }
-
-
-
-
-
-
-        // PANNING  ===============================================================================
-
-        // angle between player and soundsource in degrees
-        var angleDeg = Math.atan2(sounds[currentRoom.audioObject[i]].coordinates[1] - currentRoom.coordinates[1], sounds[currentRoom.audioObject[i]].coordinates[0] - currentRoom.coordinates[0]) * 180 / Math.PI;
-
-        // at 1 unless sound is behind.
-        behindAttenuator = 1;
-
-        // make all values positive
-        if (angleDeg < 0) {
-            behindAttenuator = 1.2;
-            angleDeg = angleDeg * -1;
-        }
-
-        // scaling 0-180 degrees to minus1 - 1 to satisfy requirements of stereo function.
-        var scaledPan = 2 / 180 * angleDeg;
-        scaledPan = scaledPan - 1;
-        scaledPan = scaledPan * -1;
-
-        sounds[currentRoom.audioObject[i]].audio[0].stereo(scaledPan, audioId[i]);
-
-        // ========================================================================================
-
-
-
-
-
-        // VOLUME  ================================================================================
-
-        var distanceToSound = Math.sqrt(Math.pow(sounds[currentRoom.audioObject[i]].coordinates[0] - currentRoom.coordinates[0], 2) + Math.pow(sounds[currentRoom.audioObject[i]].coordinates[1] - currentRoom.coordinates[1], 2));
-
-        // mapping distance values to a unit scale with logarithmic spacing 
-        var scaledVolume = Math.log(1 + distanceToSound) / Math.log(1 + 20);
-
-        scaledVolume = scaledVolume * behindAttenuator;
-
-        // if there is no previous volume
-        if (isNaN(previousVolume)) {
-            previousVolume = (1 - scaledVolume);
-        }
-
-        // adjusting volume for distance between sound and player over two seconds
-        sounds[currentRoom.audioObject[i]].audio[0].fade(previousVolume, (1 - scaledVolume), 2200, audioId[i]);
-
-        // remember volume
-        previousVolume = (1 - scaledVolume);
-
-
-        //ONENDAUDIO 
-
-        // if an audio object has an onendAudio value
-        if (sounds[currentRoom.audioObject[i]].audio.length > 1) {
-
-            // when the audio of the object finishes playing
-            sounds[currentRoom.audioObject[i]].audio[0].on('end', function() {
-                if (this == snoreWakeUp) {
-                    unconscious();
-                }
-            }, audioId[i]);
-        }
-    }
-}
-
-// ================================================================================================
-
-
-
-
-
-
-
-
-// AUDIO OBJECT ===================================================================================
+// AUDIO OBJECTS ===================================================================================
 
 let soundObject = function(audio, coordinates, active) {
     this.audio = audio;
@@ -427,6 +167,7 @@ let soundObject = function(audio, coordinates, active) {
 };
 
 sounds["waterDrops"] = new soundObject([waterDrops], [20, 15], true);
+sounds["waterDropsOff"] = new soundObject([waterDropsOff], [20, 15], false);
 sounds["snoring"] = new soundObject([snoring], [8, 28], true);
 sounds["snoreWakeUp"] = new soundObject([snoreWakeUp, hitWithClub], [8, 28], false);
 sounds["radioStatic"] = new soundObject([radioStatic], [8, 29], true);
@@ -435,9 +176,30 @@ sounds["radioStatic"] = new soundObject([radioStatic], [8, 29], true);
 
 
 
+// INTERACTABLE ITEM OBJECTS  ==================================================================================
+
+// ## TAP ##
+
+let item = function(itemName, interactions, identified, itemDescription, on) {
+    this.itemName = itemName;
+    this.interactions = interactions;
+    this.identified = identified;
+    this.itemDescription = itemDescription
+    this.on = on;
+};
+let tap = new item("tap", { explore: "You run your hands against an object directly to your right. It is some sort of rigid metal structure fixed against the wall.", identify: "tap", use: function() {return "You can turn the tap clockwise or anti-clockwise."}, turn: { clockwise: "clockwise", anticlockwise: "You turn the tap anti-clockwise." } }, false, "There is a tap in the room.", true);
+
+items.push(tap);
+
+// ## BED ##
+
+let bed = new item("bed", { explore: "You run your hands against a big flat surface. It feels soft and welcoming.", identify: "bed", use: function () {sleep(); return "You lie down on the bed. \nGradually you drift off..."}}, false, "There is a bed in the room.", true);
 
 
 
+items.push(bed);
+
+//  ===============================================================================================
 
 
 
@@ -463,31 +225,31 @@ let Room = function(name, descriptions, descriptionIndex, keyRoomDict, inputVisi
 
 
 rooms["se"] = new Room(
-    "se", ["It is pitch-black..."], 0, { north: "e", south: "wall", east: "wall", west: "sw" }, true, true, ["waterDrops", "snoring", "radioStatic"], [15, 5], []);
+    "se", ["It is pitch-black...\n"], 0, { NORTH: "e", SOUTH: "wall", EAST: "wall", WEST: "sw" }, true, true, ["waterDrops", "snoring", "radioStatic"], [15, 5], [bed]);
 
 rooms["e"] = new Room(
-    "e", ["It is pitch-black..."],
-    0, { north: "ne", south: "se", east: "wall", west: "w" }, true, true, ["waterDrops", "snoring", "radioStatic"], [15, 15], []);
+    "e", ["It is pitch-black...\n"],
+    0, { NORTH: "ne", SOUTH: "se", EAST: "wall", WEST: "w" }, true, true, ["waterDrops", "waterDropsOff", "snoring", "radioStatic"], [15, 15], [tap]);
 
 rooms["ne"] = new Room(
-    "ne", ["It is pitch-black..."],
-    0, { north: "wall", south: "e", east: "wall", west: "nw" }, true, true, ["waterDrops", "snoring", "radioStatic", "snoreWakeUp"], [15, 25], []);
+    "ne", ["It is pitch-black...\n"],
+    0, { NORTH: "wall", SOUTH: "e", EAST: "wall", WEST: "nw" }, true, true, ["waterDrops", "snoring", "radioStatic", "snoreWakeUp"], [15, 25], []);
 
 rooms["nw"] = new Room(
-    "nw", ["It is pitch-black..."],
-    0, { north: "wall", south: "w", east: "ne", west: "wall" }, true, true, ["waterDrops", "snoring", "radioStatic"], [5, 25], []);
+    "nw", ["It is pitch-black...\n"],
+    0, { NORTH: "wall", SOUTH: "w", EAST: "ne", WEST: "wall" }, true, true, ["waterDrops", "snoring", "radioStatic"], [5, 25], []);
 
 rooms["w"] = new Room(
-    "w", ["It is pitch-black..."],
-    0, { north: "nw", south: "sw", east: "e", west: "wall" }, true, true, ["waterDrops", "snoring", "radioStatic"], [5, 15], []);
+    "w", ["It is pitch-black...\n"],
+    0, { NORTH: "nw", SOUTH: "sw", EAST: "e", WEST: "wall" }, true, true, ["waterDrops", "snoring", "radioStatic"], [5, 15], []);
 
 rooms["sw"] = new Room(
-    "sw", ["It is pitch-black..."],
-    0, { north: "w", south: "wall", east: "se", west: "wall" }, true, true, ["waterDrops", "snoring", "radioStatic"], [5, 5], []);
+    "sw", ["It is pitch-black...\n"],
+    0, { NORTH: "w", SOUTH: "wall", EAST: "se", WEST: "wall" }, true, true, ["waterDrops", "snoring", "radioStatic"], [5, 5], []);
 
 rooms["unconscious"] = new Room(
-    "sw", ["You are unconscious..."],
-    0, { restart: "se" }, true, true, [], [5, 5], []);
+    "sw", ["You are unconscious...\n"],
+    0, { RESTART: "se" }, true, true, [], [5, 5], []);
 
 // ================================================================================================
 
