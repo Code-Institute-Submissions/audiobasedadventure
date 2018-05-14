@@ -3,6 +3,8 @@
 // PROCESS USER INPUT =============================================================================
 
 function processUserInput() {
+    
+    console.log(verbs)
 
     // userInput is made into lower case
     var userInput = document.getElementById("userInput").value.toLowerCase();
@@ -76,9 +78,11 @@ function processRoomAttributes() {
 
 
     // When in NE
-    if (currentRoom.name == "ne") {
+    if (currentRoom.name == "ne" && groundWet) {
         sounds["snoring"].active = false;
         sounds["snoreWakeUp"].active = true;
+        
+        printToLog("You are knocked unconscious by a blow to the head. \n\nType 'restart' to play again")
     }
     else {
         sounds["snoring"].active = true;

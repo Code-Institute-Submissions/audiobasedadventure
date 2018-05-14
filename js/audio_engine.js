@@ -2,11 +2,13 @@
 
 function playCurrentRoomAudio() {
 
+    // check conditions before playing audio. 
     if (previousRoom != currentRoom.name) {
         if (groundWet) {
             footStepsInWater.play();
         } else {
             footSteps.play();
+            
         }
         previousRoom = currentRoom.name;
     }
@@ -69,19 +71,6 @@ function playCurrentRoomAudio() {
 
         // ========================================================================================
 
-
-        //ONENDAUDIO ==============================================================================
-
-        // if an audio object has an onendAudio value
-        if (sounds[currentRoom.audioObject[i]].audio.length > 1) {
-
-            // when the audio of the object finishes playing
-            sounds[currentRoom.audioObject[i]].audio[0].on('end', function() {
-                if (this == snoreWakeUp) {
-                    unconscious();
-                }
-            }, audioId[i]);
-        }
     }
 }
 

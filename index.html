@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,31 +8,37 @@
 
     <!--bootstrap-->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    
+
     <!--jquery-->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    
-    
+
     <!--Howler-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.10/howler.min.js"></script>
-    
+
+
     <!--main js sheet-->
     <script src="js/main.js"></script>
     
+        <!--core_verbs.js-->
+    <script src="js/core_verbs.js"></script>
+
+    <!--audio_files.js-->
+    <script src="js/audio_files.js"></script>
+
+    <!--items.js-->
+    <script src="js/items.js"></script>
+
+    <!--rooms-->
+    <script src="js/rooms.js"></script>
+
     <!--text_engine.js-->
-     <script src="js/text_engine.js"></script> 
-     
-     <!--verbs.js-->
-     <script src="js/verbs.js"></script>
-    
+    <script src="js/text_engine.js"></script>
+
     <!--audio_engine js-->
     <script src="js/audio_engine.js"></script>
-    
-    <!--audio_files-->
-    <script src="js/audio_files.js"></script>
-    
-    
-    
+
+
+
     <!--style sheet-->
     <link rel="stylesheet" href="css/style.css" type="text/css" />
 
@@ -52,7 +57,7 @@
         <!--user input form: submits on enter-->
         <form id="myForm" name="answerForm" onsubmit="processUserInput(); this.reset(); return false;" action="#">
             <!--hidden by default-->
-            <input type="text" name="userInput" id="userInput" placeholder="your response..." autofocus autocomplete="off" visibility = "hidden"></input>
+            <input type="text" name="userInput" id="userInput" placeholder="your response..." autofocus autocomplete="off" visibility="hidden"></input>
         </form>
 
     </div>

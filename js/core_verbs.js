@@ -1,3 +1,4 @@
+
 // VERB FUNCTIONS  ================================================================================
 
 function go(directionNoun) {
@@ -32,7 +33,7 @@ function go(directionNoun) {
                         printToLog(currentRoom.interactableItems[i].itemDescription);
                     }
                 }
-                
+
                 // playCurrentRoomAudio
                 playCurrentRoomAudio();
             }
@@ -208,50 +209,31 @@ function turn(objectAndDirectionToTurn) {
 
 
 
-
-// VERB OBJECTS  ==================================================================================
-
-// ## GO ##
+// VERBS  =========================================================================================
 
 let verb = function(verbName, process) {
     this.verbName = verbName;
     this.process = process;
 };
-let verb1 = new verb("go", function(secondWord) {
+
+verbs["go"] = new verb("go", function(secondWord) {
     go(secondWord);
 });
-verbs.push(verb1);
 
-let verb2 = new verb("explore", function(secondWord) {
+verbs["explore"]  = new verb("explore", function(secondWord) {
     explore(secondWord);
 });
-verbs.push(verb2);
 
-let verb3 = new verb("identify", function(secondWord) {
+verbs["identify"] = new verb("identify", function(secondWord) {
     identify(secondWord);
 });
-verbs.push(verb3);
 
-let verb4 = new verb("use", function(secondWord) {
+verbs["use"] = new verb("use", function(secondWord) {
     use(secondWord);
 });
-verbs.push(verb4);
 
-let verb5 = new verb("turn", function(secondWord, thirdWord) {
+verbs["turn"] = new verb("turn", function(secondWord, thirdWord) {
     turn(secondWord, thirdWord);
 })
-verbs.push(verb5);
-
-//  ===============================================================================================
-
-
-
-
-
-
-
-
-
-
 
 //  ===============================================================================================
