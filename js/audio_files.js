@@ -1,8 +1,7 @@
 
 // AUDIO FILES ====================================================================================
 
-/* Audio objects add additional functionality to the audio files by giving them coordinates for 
-directionality and an active state to contol whether the audio file should be audible or not. */
+/* https://github.com/goldfire/howler.js#documentation: howler.js is an audio library for the modern web. It defaults to Web Audio API and falls back to HTML5 Audio. This makes working with audio in JavaScript easy and reliable across all platforms. */
 
 var waterDrops = new Howl({
     src: ['audio/waterDrops.mp3'],

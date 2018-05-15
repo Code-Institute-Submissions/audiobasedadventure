@@ -3,44 +3,19 @@
 /* Item functions are separate from core functions. They are functions that are specific to certain
 items. Item objects are at the bottom of this script. */
 
-// TAP FUNCTION -----------------------------------------------------------------------------------
+// RADIO ON --------------------------------------------------------------------------------------
 
-function tapFunction(direction) {
-
-    // if turned anticlockwise
-    if (direction == "anticlockwise") {
-
-        if (sounds["waterDrops"].active) {
-            // water drops sound should stop
-            sounds["waterDrops"].active = false;
-            // tap is off
-            tap.on = false;
-            
-            // record the time that the tap is switched off.
-            timeOfTapOff = time;
-            
-            sounds["waterDropsOff"].active = true;
-        } else {
-            printToLog("Nothing happens.")
-        }
-
+function radioOn() {
+    
+    
+    // if the radio has no batteries
+    if(!items["radio"].usable) {
+        
+        printToLog("You try to switch on the radio but nothing happens.");
+        return;
     }
-    else {
-        if (!sounds["waterDrops"].active) {
-            // water drops sound should stop
-            sounds["waterDrops"].active = true;
-            // tap is off
-            tap.on = true;
-            sounds["waterDropsOff"].active = false;
-        } else {
-            printToLog("Nothing happens.")
-        }
-    }
-    // playCurrentRoomAudio
-    playCurrentRoomAudio();
-    sounds["waterDropsOff"].active = false;
-    return;
 }
+
 //  -----------------------------------------------------------------------------------------------
 
 //  ===============================================================================================
@@ -51,20 +26,36 @@ function tapFunction(direction) {
 
 // INTERACTABLE ITEM OBJECTS  =====================================================================
 
-let item = function(itemName, interactions, identified, itemDescription, on) {
+let item = function(itemName, interactions, identified, itemDescription, usable, on) {
     this.itemName = itemName;
     this.interactions = interactions;
     this.identified = identified;
-    this.itemDescription = itemDescription
+    this.itemDescription = itemDescription;
+    this.usable = usable;
     this.on = on;
 };
 
-// ## TAP ##
-
-items["tap"] = new item("tap", { explore: "You run your hands against an object directly to your right. It is some sort of rigid metal structure fixed against the wall.", identify: "tap", use: function() {return "You can turn the tap clockwise or anti-clockwise."}, turn: { clockwise: "clockwise", anticlockwise: "You turn the tap anti-clockwise." } }, false, "There is a tap in the room.", true);
-
 // ## RADIO ##
 
-items["radio"] = new item("radio", { explore: "You run your hands over a device with pushable buttons and twistable knobs.", identify: "radio", use: function() {return "You can turn the knob of the radio clockwise or anti-clockwise."}, turn: { clockwise: "clockwise", anticlockwise: "You turn the knob anti-clockwise." } }, false, "There is a radio in the room.", true);
+items["radio"] = new item(
+    "radio", 
+    { 
+        // interactions
+        explore: "You run your hands over a plastic device with pushable buttons and twistable knobs.", 
+        identify: "radio", 
+        examine: "You can turn the radio on and off and you can turn the knob of the radio clockwise or anti-clockwise.",
+        // use is switching on an off the radio
+        use: function() {
+            radioOn();
+        }, 
+        turn: { 
+            clockwise: "clockwise", 
+            anticlockwise: "You turn the knob anti-clockwise." 
+        } 
+    }, 
+    false, 
+    "There is a radio in the room.", 
+    false,
+    false);
 
 //  ===============================================================================================

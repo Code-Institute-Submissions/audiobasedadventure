@@ -2,17 +2,6 @@
 
 function playCurrentRoomAudio() {
 
-    // check conditions before playing audio. 
-    if (previousRoom != currentRoom.name) {
-        if (groundWet) {
-            footStepsInWater.play();
-        } else {
-            footSteps.play();
-            
-        }
-        previousRoom = currentRoom.name;
-    }
-
     for (var i = 0; i < currentRoom.audioObject.length; i++) {
 
         if ((!sounds[currentRoom.audioObject[i]].audio[0].playing(audioId[i]))) {
@@ -25,7 +14,7 @@ function playCurrentRoomAudio() {
         }
 
 
-        // PANNING  ===============================================================================
+        // PANNING  -------------------------------------------------------------------------------
 
         // angle between player and soundsource in degrees
         var angleDeg = Math.atan2(sounds[currentRoom.audioObject[i]].coordinates[1] - currentRoom.coordinates[1], sounds[currentRoom.audioObject[i]].coordinates[0] - currentRoom.coordinates[0]) * 180 / Math.PI;
@@ -46,10 +35,11 @@ function playCurrentRoomAudio() {
 
         sounds[currentRoom.audioObject[i]].audio[0].stereo(scaledPan, audioId[i]);
 
-        // ========================================================================================
+        // ----------------------------------------------------------------------------------------
 
 
-        // VOLUME  ================================================================================
+
+        // VOLUME  --------------------------------------------------------------------------------
 
         var distanceToSound = Math.sqrt(Math.pow(sounds[currentRoom.audioObject[i]].coordinates[0] - currentRoom.coordinates[0], 2) + Math.pow(sounds[currentRoom.audioObject[i]].coordinates[1] - currentRoom.coordinates[1], 2));
 
@@ -69,9 +59,7 @@ function playCurrentRoomAudio() {
         // remember volume
         previousVolume = (1 - scaledVolume);
 
-        // ========================================================================================
-
+        // ----------------------------------------------------------------------------------------
     }
 }
-
 // ================================================================================================

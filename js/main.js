@@ -29,15 +29,15 @@ var items = [];
 var rooms = [];
 var sounds = [];
 var audioId = [];
+var inventory = [];
 var directionNouns = ["NORTH", "SOUTH", "EAST", "WEST"];
 var timeValues = {minute: "1", minutes: "1", hour: "60", hours: "60"};
 var currentAudio;
 var previousVolume;
-var groundWet = true;
-var timeOfTapOff;
 var previousRoom = "se";
 var behindAttenuator;
 var hasPlayed = false;
-var time = 0;
+
+var radioChannel = 0;
 
 //  ===============================================================================================
