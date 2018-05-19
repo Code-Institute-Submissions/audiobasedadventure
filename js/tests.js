@@ -6,7 +6,7 @@ function test_are_equal(actual, expected) {
 
 function test_states_are_equal(actual, expected) {
     if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-        throw new Error("Expected '" + JSON.stringify(expected) + "' but got '" + JSON.stringify(actual) + "'.");
+        throw new Error("Expected '" + JSON.stringify(expected) + "'\n\n\nbut got\n\n\n'" + JSON.stringify(actual) + "'.");
     }
 }
 

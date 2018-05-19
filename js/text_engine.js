@@ -1,4 +1,3 @@
-
 // acceptUserInput ==================================================================================
 
 function acceptUserInput() {
@@ -83,7 +82,7 @@ function unitTesting() {
     test_arrays_are_equal(parser(["walk", "north"]), ["go", "north"]);
     test_arrays_are_equal(parser(["travel", "north"]), ["go", "north"]);
     test_arrays_are_equal(parser(["run", "north"]), ["go", "north"]);
-    
+
     // verbs
     test_states_are_equal(verbs["go"].process(["north"]), testStateNE);
     test_states_are_equal(verbs["go"].process(["south"]), testStateSE);
@@ -100,10 +99,25 @@ function unitTesting() {
     test_states_are_equal(verbs["go"].process(["north"]), testStateNE);
     test_states_are_equal(verbs["go"].process(["north"]), testStateNEboundary);
     test_states_are_equal(verbs["go"].process(["east"]), testStateNEboundary);
-    
 
+    test_states_are_equal(verbs["explore"].process(["something"]), testStateExploreNEsomething);
+    test_states_are_equal(verbs["explore"].process(["surroundings"]), testStateExploreNE);
+    test_states_are_equal(verbs["go"].process(["south"]), testStateSE);
+    test_states_are_equal(verbs["explore"].process(["surroundings"]), testStateExploreSE);
+
+    test_states_are_equal(verbs["examine"].process(["radio"]), testStateRadioUnidentified);
+    test_states_are_equal(verbs["take"].process(["radio"]), testStateTakeRadioUnidentified);
+    test_states_are_equal(verbs["examine"].process(["door"]), testStateDoor);
     
+    test_states_are_equal(verbs["identify"].process(["door"]), testStateIdentifyDoor);
+    test_states_are_equal(verbs["identify"].process(["radio"]), testStateIdentifyRadio);
+    test_states_are_equal(verbs["identify"].process(["radio"]), testStateIdentifyRadioAgain);
     
+    test_states_are_equal(verbs["take"].process(["door"]), testStateTakeDoor);
+    test_states_are_equal(verbs["inventory"].process(), testStateInventory);
+    test_states_are_equal(verbs["take"].process(["radio"]), testStateTakeRadio);
+    test_states_are_equal(verbs["inventory"].process(), testStateInventoryRadio);
+
     // unpackGameStateIntoString
     test_are_equal(unpackGameStateIntoString(gameState), "It is pitch-black...\n");
 

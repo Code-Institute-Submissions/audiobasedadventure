@@ -40,7 +40,7 @@ items["radio"] = new item(
     { 
         // interactions
         explore: "You run your hands over a plastic device with pushable buttons and twistable knobs.", 
-        identify: "radio", 
+        identify: "You identify a radio in the room.", 
         examine: "You can turn the radio on and off and you can turn the knob of the radio clockwise or anti-clockwise.",
         // use is switching on an off the radio
         use: function() {

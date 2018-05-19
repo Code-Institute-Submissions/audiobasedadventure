@@ -1,5 +1,4 @@
-
-// VERB FUNCTIONS  ================================================================================
+// VERBS  =========================================================================================
 
 // go ---------------------------------------------------------------------------------------------
 
@@ -11,76 +10,96 @@ function go(directionNoun) {
         if (rooms[roomToChangeTo] instanceof Object) {
             gameState.actionResponse = "";
             gameState.currentRoom = rooms[roomToChangeTo];
-        } else {
+        }
+        else {
             gameState.actionResponse = roomToChangeTo;
         }
     }
     return gameState;
 }
 
-function explore(surroundings) {
+// examine ----------------------------------------------------------------------------------------
 
-    if (surroundings.length != 1 || surroundings[0] != "surroundings") {
-        printToLog("You can only explore 'surroundings'.");
-        return;
-    }
-    printToLog("You use your hands to explore your surroundings.");
+function examine(itemNoun) {
 
-    for (var i = 0; i < currentRoom.interactableItems.length; i++) {
-        if ("explore" in currentRoom.interactableItems[i].interactions) {
-            printToLog(currentRoom.interactableItems[i].interactions["explore"]);
+    for (var i = 0; i < gameState.currentRoom.interactableItems.length; i++) {
+        var itemToExamine = gameState.currentRoom.interactableItems[i];
+        if (itemToExamine.itemName == itemNoun[0]) {
+            if (!itemToExamine.identified) {
+                gameState.actionResponse = "You cannot examine an item until you have identified it.";
+            }
+            else {
+                gameState.actionResponse = itemToExamine.interactions["examine"];
+            }
+            return gameState;
         }
     }
-    return;
+    gameState.actionResponse = "There is no " + itemNoun + " to examine.";
+    return gameState;
 }
-//  -----------------------------------------------------------------------------------------------
 
+//  explore ---------------------------------------------------------------------------------------
 
+function explore(surroundings) {
 
+    if (surroundings[0] != "surroundings") {
+        gameState.actionResponse = "You can only explore 'surroundings'.";
+    }
+    else {
+        gameState.actionResponse = "You use your hands to explore your surroundings.\n";
+        for (var i = 0; i < gameState.currentRoom.interactableItems.length; i++) {
+            var itemToExplore = gameState.currentRoom.interactableItems[i]
+            gameState.actionResponse += itemToExplore.interactions["explore"];
+        }
+    }
+    return gameState;
+}
 
-// IDENTIFY FUNCTION ------------------------------------------------------------------------------
+// identify ---------------------------------------------------------------------------------------
 
 function identify(userGuess) {
 
-
-    if (userGuess.length != 1) {
-        printToLog("You must use only one word with 'identify'");
-        return;
-    }
-
-    // for every interactable object in the room
-    for (var i = 0; i < currentRoom.interactableItems.length; i++) {
-
-        // if userGuess is not the name of an interactable object in the room.
-        if (currentRoom.interactableItems[i].itemName != userGuess[0]) {
-            printToLog("There is no " + userGuess[0] + " in the room.");
+    for (var i = 0; i < gameState.currentRoom.interactableItems.length; i++) {
+        var itemToIdentify = gameState.currentRoom.interactableItems[i];
+        if (itemToIdentify.itemName != userGuess[0]) {
+            gameState.actionResponse = "There is no " + userGuess[0] + " in the room.";
         }
-
-        // if the object has not yet been identified
-        if (!currentRoom.interactableItems[i].identified) {
-            // change the item's identified state to true
-            currentRoom.interactableItems[i].identified = true;
-            // print the object's description
-            printToLog(currentRoom.interactableItems[i].itemDescription);
+        else if (!itemToIdentify.identified) {
+            itemToIdentify.identified = true;
+            gameState.actionResponse = itemToIdentify.interactions["identify"];
         }
         else {
-            printToLog(currentRoom.interactableItems[i].itemName + " has already been identified");
+            gameState.actionResponse = itemToIdentify.itemName.charAt(0).toUpperCase() + itemToIdentify.itemName.slice(1) + " has already been identified";
         }
     }
-    return;
+    return gameState;
 }
-//  -----------------------------------------------------------------------------------------------
 
+// take -------------------------------------------------------------------------------------------
 
+function take(itemNoun) {
 
+    for (var i = 0; i < gameState.currentRoom.interactableItems.length; i++) {
 
-// USE FUNCTION -----------------------------------------------------------------------------------
+        var itemToTake = gameState.currentRoom.interactableItems[i];
+        if (!itemToTake.identified) {
+            gameState.actionResponse = "You cannot take an item until you have identified it.";
+            return gameState;
+        }
+        else if (itemToTake.itemName == itemNoun[0]) {
+            gameState.actionResponse = "You take the " + itemNoun[0] + ". \n(You can look inside your inventory by entering 'inventory')";
+            gameState.inventory.push(items[itemNoun]);
+            return gameState;
+        }
+    }
+    gameState.actionResponse = "There is no " + itemNoun[0] + " in the room.";
+    return gameState;
+}
+
+// use --------------------------------------------------------------------------------------------
 
 function use(objectToUse) {
-    if (objectToUse.length != 1) {
-        printToLog("You must use only one word with 'use'");
-        return;
-    }
+
     for (var i = 0; i < currentRoom.interactableItems.length; i++) {
         if (currentRoom.interactableItems[i].itemName == objectToUse[0]) {
             if (currentRoom.interactableItems[i].identified) {
@@ -96,102 +115,26 @@ function use(objectToUse) {
     printToLog("There is no " + objectToUse[0] + " in the room or in your inventory.");
     return;
 }
-//  -----------------------------------------------------------------------------------------------
 
-
-
-
-// TAKE FUNCTION -----------------------------------------------------------------------------------
-
-function take(objectToTake) {
-
-    // if the userInput has the correct number of words
-    if (objectToTake.length != 1) {
-        printToLog("You must use one noun with 'take'");
-        return;
-    }
-    // for every interactable object in the room
-    for (var i = 0; i < currentRoom.interactableItems.length; i++) {
-
-        // if objectToTake is the name of an interactable object in the room.
-        if (currentRoom.interactableItems[i].itemName == objectToTake[0]) {
-
-            // if the item has been identified
-            if (currentRoom.interactableItems[i].identified) {
-                // print the used description
-                printToLog("You take the " + objectToTake[0] + ". \n(You can look inside your inventory by entering 'inventory')");
-                console.log(inventory);
-                inventory.push(items[objectToTake[0]]);
-                return;
-            }
-            else {
-                printToLog("You cannot take an item until you have identified it.");
-                return;
-            }
-        }
-    }
-    printToLog("There is no " + objectToTake[0] + " in the room or in your inventory.");
-    return;
-}
-//  -----------------------------------------------------------------------------------------------
-
-
-
-
-// EXAMINE FUNCTION -------------------------------------------------------------------------------
-
-function examine(objectToExamine) {
-
-    // if the userInput has the correct number of words
-    if (objectToExamine.length != 1) {
-        printToLog("You must use one noun with 'examine'");
-        return;
-    }
-    // for every interactable object in the room
-    for (var i = 0; i < currentRoom.interactableItems.length; i++) {
-
-        // if objectToUse is the name of an interactable object in the room or in the inventory.
-        if (currentRoom.interactableItems[i].itemName == objectToExamine[0]) {
-
-            // if the item has been identified
-            if (currentRoom.interactableItems[i].identified) {
-                // print the used description
-                printToLog(currentRoom.interactableItems[i].interactions["examine"]);
-                return;
-            }
-            else {
-                printToLog("You cannot examine an item until you have identified it.");
-                return;
-            }
-        }
-    }
-    printToLog("There is no " + objectToExamine[0] + " in the room or in your inventory.");
-    return;
-}
-//  -----------------------------------------------------------------------------------------------
-
-
-
-
-
-// INVENTORY FUNCTION -----------------------------------------------------------------------------
+// inventory --------------------------------------------------------------------------------------
 
 function showInventory() {
 
-    if (inventory.length == 0) {
-        printToLog("Your inventory is empty.");
-        return;
+    if (gameState.inventory.length == 0) {
+        gameState.actionResponse = "Your inventory is empty.";
+        return gameState;
     }
+    else {
+        gameState.actionResponse = "You look inside your inventory:\n";
 
-    printToLog("You look inside your inventory:");
-
-    for (var i = 0; i < inventory.length; i++) {
-        printToLog(inventory[i].name);
+        for (var i = 0; i < gameState.inventory.length; i++) {
+            gameState.actionResponse += gameState.inventory[i].itemName.charAt(0).toUpperCase() + gameState.inventory[i].itemName.slice(1) + "\n";
+        }
+        return gameState;
     }
-    return;
 }
 
-//  -----------------------------------------------------------------------------------------------
+//  restart ---------------------------------------------------------------------------------------
 
 
 // TURN FUNCTION ----------------------------------------------------------------------------------
@@ -225,28 +168,28 @@ verbs["go"] = new verb("go", function(secondWord) {
     return go(secondWord);
 });
 
+verbs["examine"] = new verb("examine", function(secondWord) {
+    return examine(secondWord);
+});
+
 verbs["explore"] = new verb("explore", function(secondWord) {
-    explore(secondWord);
+    return explore(secondWord);
 });
 
 verbs["identify"] = new verb("identify", function(secondWord) {
-    identify(secondWord);
-});
-
-verbs["examine"] = new verb("examine", function(secondWord) {
-    examine(secondWord);
+    return identify(secondWord);
 });
 
 verbs["take"] = new verb("take", function(secondWord) {
-    take(secondWord);
+    return take(secondWord);
 });
 
 verbs["use"] = new verb("use", function(secondWord) {
-    use(secondWord);
+    return use(secondWord);
 });
 
 verbs["inventory"] = new verb("inventory", function() {
-    showInventory();
+    return showInventory();
 });
 
 verbs["turn"] = new verb("turn", function(secondWord, thirdWord) {

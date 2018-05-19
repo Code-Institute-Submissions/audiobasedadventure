@@ -1,7 +1,7 @@
 
 // ROOM OBJECT ====================================================================================
 
-let Room = function(name, description, keyRoomDict, audioObject, coordinates, interactableItems) {
+let Room = function(name, description, keyRoomDict, coordinates, interactableItems) {
     this.name = name;
     this.description = description;
     this.keyRoomDict = keyRoomDict;
