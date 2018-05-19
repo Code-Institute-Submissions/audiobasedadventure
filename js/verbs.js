@@ -1,56 +1,33 @@
+
 // VERB FUNCTIONS  ================================================================================
 
-// GO FUNCTION ------------------------------------------------------------------------------------
+// go ---------------------------------------------------------------------------------------------
 
 function go(directionNoun) {
 
-    // if the userInput does not have the correct number of words
-    if (directionNoun.length != 1) {
-        printToLog("You must provide one word to specify direction.");
-        return;
-    }
+    if (directionNoun[0] in gameState.currentRoom.keyRoomDict) {
+        var roomToChangeTo = gameState.currentRoom.keyRoomDict[directionNoun[0]];
 
-    // if the direction noun is a valid direction noun
-    if (directionNouns.indexOf(directionNoun[0]) < 0) {
-        printToLog("You must specify a valid direction ('north', 'south', 'east', 'west')");
-        return;
+        if (rooms[roomToChangeTo] instanceof Object) {
+            gameState.actionResponse = "";
+            gameState.currentRoom = rooms[roomToChangeTo];
+        } else {
+            gameState.actionResponse = roomToChangeTo;
+        }
     }
-
-    // if the direction noun returns a key
-    if (rooms[currentRoom.keyRoomDict[directionNoun[0]]] instanceof Object) {
-
-        // change room
-        changeRoom(rooms[currentRoom.keyRoomDict[directionNoun[0]]]);
-    }
-    else {
-        // print the value associated with the key
-        printToLog(currentRoom.keyRoomDict[directionNoun[0]]);
-    }
-    return;
+    return gameState;
 }
-//  -----------------------------------------------------------------------------------------------
-
-
-
-
-// EXPLORE FUNCTION -------------------------------------------------------------------------------
 
 function explore(surroundings) {
 
-    // if the userInput has the correct number of words and that the second word is 'surroundings'
     if (surroundings.length != 1 || surroundings[0] != "surroundings") {
         printToLog("You can only explore 'surroundings'.");
         return;
     }
     printToLog("You use your hands to explore your surroundings.");
 
-    // for every interactable item in the room
     for (var i = 0; i < currentRoom.interactableItems.length; i++) {
-
-        // if the interactable item can be examined
         if ("explore" in currentRoom.interactableItems[i].interactions) {
-
-            // print the item's explore description
             printToLog(currentRoom.interactableItems[i].interactions["explore"]);
         }
     }
@@ -65,7 +42,7 @@ function explore(surroundings) {
 
 function identify(userGuess) {
 
-    // if the userInput has the correct number of words
+
     if (userGuess.length != 1) {
         printToLog("You must use only one word with 'identify'");
         return;
@@ -100,21 +77,13 @@ function identify(userGuess) {
 // USE FUNCTION -----------------------------------------------------------------------------------
 
 function use(objectToUse) {
-
-    // if the userInput has the correct number of words
     if (objectToUse.length != 1) {
         printToLog("You must use only one word with 'use'");
         return;
     }
-    // for every interactable object in the room
     for (var i = 0; i < currentRoom.interactableItems.length; i++) {
-
-        // if objectToUse is the name of an interactable object in the room or in the inventory.
         if (currentRoom.interactableItems[i].itemName == objectToUse[0]) {
-
-            // if the item has been identified
             if (currentRoom.interactableItems[i].identified) {
-                // print the used description
                 printToLog(currentRoom.interactableItems[i].interactions["use"]());
                 return;
             }
@@ -136,8 +105,6 @@ function use(objectToUse) {
 
 function take(objectToTake) {
 
-    console.log("hello?");
-
     // if the userInput has the correct number of words
     if (objectToTake.length != 1) {
         printToLog("You must use one noun with 'take'");
@@ -153,7 +120,7 @@ function take(objectToTake) {
             if (currentRoom.interactableItems[i].identified) {
                 // print the used description
                 printToLog("You take the " + objectToTake[0] + ". \n(You can look inside your inventory by entering 'inventory')");
-                console.log(items[objectToTake[0]]);
+                console.log(inventory);
                 inventory.push(items[objectToTake[0]]);
                 return;
             }
@@ -209,7 +176,7 @@ function examine(objectToExamine) {
 
 // INVENTORY FUNCTION -----------------------------------------------------------------------------
 
-function inventory() {
+function showInventory() {
 
     if (inventory.length == 0) {
         printToLog("Your inventory is empty.");
@@ -219,7 +186,7 @@ function inventory() {
     printToLog("You look inside your inventory:");
 
     for (var i = 0; i < inventory.length; i++) {
-        printToLog(inventory[i]);
+        printToLog(inventory[i].name);
     }
     return;
 }
@@ -230,22 +197,12 @@ function inventory() {
 // TURN FUNCTION ----------------------------------------------------------------------------------
 
 function turn(objectAndDirectionToTurn) {
-
-    // if the userInput has the correct number of words
     if (objectAndDirectionToTurn.length == 2) {
         printToLog("You must use two words with 'turn' (object to turn and direction to turn')");
     }
-
-    // check if the object is in the room or inventory
     for (var i = 0; i < currentRoom.interactableItems.length; i++) {
-
-        // if the userInput item is in the current room and "turn" i an interaction of that item
         if ((currentRoom.interactableItems[i].itemName == objectAndDirectionToTurn[0]) && ("turn" in currentRoom.interactableItems[i].interactions)) {
-
-            // if user gives a key as a third word
             if (objectAndDirectionToTurn[1] in currentRoom.interactableItems[i].interactions["turn"]) {
-
-                // run tap function
                 tapFunction(objectAndDirectionToTurn[1]);
             }
             printToLog("You cannot turn this direction.")
@@ -265,7 +222,7 @@ let verb = function(verbName, process) {
 };
 
 verbs["go"] = new verb("go", function(secondWord) {
-    go(secondWord);
+    return go(secondWord);
 });
 
 verbs["explore"] = new verb("explore", function(secondWord) {
@@ -289,7 +246,7 @@ verbs["use"] = new verb("use", function(secondWord) {
 });
 
 verbs["inventory"] = new verb("inventory", function() {
-    inventory();
+    showInventory();
 });
 
 verbs["turn"] = new verb("turn", function(secondWord, thirdWord) {

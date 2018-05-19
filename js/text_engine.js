@@ -1,82 +1,111 @@
-// PROCESS USER INPUT =============================================================================
 
-function processUserInput() {
+// acceptUserInput ==================================================================================
 
-    // userInput is made into lower case
+function acceptUserInput() {
+
     var userInput = document.getElementById("userInput").value.toLowerCase();
-
-    // check that user has inputted something
-    if (userInput == "") {
-        console.log("Empty userInput")
-        return;
-    }
-    // parse userInput
-    userInput = parser(userInput);
-
-    // split userInput into words
     var userInputWords = userInput.split(" ");
+    var userInputWordsCleaned = deleteUnwantedWords(userInputWords);
+    userInputWordsParsed = parser(userInputWordsCleaned);
 
-    // if the user's first word is a valid verb
-    if (userInputWords[0] in verbs) {
+    var userVerb = userInputWords[0];
+    var userNouns = userInputWords.slice(1, userInputWords.length);
 
-        // add the current log to the logHistoryArray
-        logHistoryArray = logHistoryArray.concat(logArray);
-
-        // empty the log
-        logArray = [];
-
-        // input the remaining words to the verb function
-        verbs[userInputWords[0]].process(userInputWords.slice(1, userInputWords.length));
-        return;
+    if (userVerb in verbs) {
+        gameState = verbs[userInputWords[0]].process(userNouns);
     }
-    printToLog("First word should be a verb");
-
-
-}
-// ================================================================================================
-
-
-
-
-// PARSER =========================================================================================
-
-function parser(userInput) {
-    userInput = userInput.replace("north", "NORTH");
-    userInput = userInput.replace("south", "SOUTH");
-    userInput = userInput.replace("east", "EAST");
-    userInput = userInput.replace("west", "WEST");
-    userInput = userInput.replace("history", "HISTORY");
-    userInput = userInput.replace("-", "");
-    return userInput;
+    var gameStateAsString = unpackGameStateIntoString(gameState);
+    printGameStateToUser(gameStateAsString);
 }
 
-// ================================================================================================
+// deleteUnwantedWords ============================================================================
 
+function deleteUnwantedWords(userInputWords) {
 
+    var userInputWordsCleaned = [];
+    var wordsToDelete = new Set(["to", "the"]);
 
-
-// PRINT TO LOG ===================================================================================
-
-function printToLog(textToPrint) {
-
-    // add input to log
-    logArray.push(textToPrint);
-    // print log
-    document.getElementById("console").innerHTML = logArray.join("\n");
-
+    for (var i = 0; i < userInputWords.length; i++) {
+        if (wordsToDelete.has(userInputWords[i])) {
+            continue;
+        }
+        userInputWordsCleaned.push(userInputWords[i]);
+    }
+    return userInputWordsCleaned;
 }
-// ================================================================================================
 
+// parser =========================================================================================
 
+function parser(userInputWords) {
 
+    var wordReplacementPairs = { "head": "go", "walk": "go", "move": "go", "travel": "go", "run": "go" };
 
-// PRINT LOG  HISTORY =============================================================================
-
-function printLogHistory() {
-
-    // print log
-    document.getElementById("console").reset();
-    document.getElementById("console").innerHTML += "\nLog history: " + (logHistoryArray.join("\n")) + "\n" +
-        currentRoom.description;
+    for (var i = 0; i < userInputWords.length; i++) {
+        if (userInputWords[i] in wordReplacementPairs) {
+            userInputWords[i] = wordReplacementPairs[userInputWords[i]];
+            if (userInputWords[i] == "") {
+                userInputWords.splice(i, 1);
+            }
+        }
+    }
+    return userInputWords;
 }
-// ================================================================================================
+
+// unpackGameStateIntoString ======================================================================
+
+function unpackGameStateIntoString(gameState) {
+    var gameStateAsString = gameState.currentRoom.description;
+    gameStateAsString.concat(gameState.actionResponse);
+    return gameStateAsString;
+}
+
+
+// printGameStateToUser ===========================================================================
+
+function printGameStateToUser(stringToPrint) {
+    document.getElementById("console").innerHTML = stringToPrint;
+}
+
+// unitTesting ====================================================================================
+
+function unitTesting() {
+
+    // deleteUnwantedWords
+    test_arrays_are_equal(deleteUnwantedWords(["hello"]), ["hello"]);
+    test_arrays_are_equal(deleteUnwantedWords(["use", "the", "radio"]), ["use", "radio"]);
+    test_arrays_are_equal(deleteUnwantedWords(["go", "to", "the", "north"]), ["go", "north"]);
+
+    // parser
+    test_arrays_are_equal(parser(["hello"]), ["hello"]);
+    test_arrays_are_equal(parser(["use", "radio"]), ["use", "radio"]);
+    test_arrays_are_equal(parser(["head", "north"]), ["go", "north"]);
+    test_arrays_are_equal(parser(["move", "north"]), ["go", "north"]);
+    test_arrays_are_equal(parser(["walk", "north"]), ["go", "north"]);
+    test_arrays_are_equal(parser(["travel", "north"]), ["go", "north"]);
+    test_arrays_are_equal(parser(["run", "north"]), ["go", "north"]);
+    
+    // verbs
+    test_states_are_equal(verbs["go"].process(["north"]), testStateNE);
+    test_states_are_equal(verbs["go"].process(["south"]), testStateSE);
+    test_states_are_equal(verbs["go"].process(["west"]), testStateSW);
+    test_states_are_equal(verbs["go"].process(["north"]), testStateNW);
+    test_states_are_equal(verbs["go"].process(["north"]), testStateNWboundary);
+    test_states_are_equal(verbs["go"].process(["west"]), testStateNWboundary);
+    test_states_are_equal(verbs["go"].process(["south"]), testStateSW);
+    test_states_are_equal(verbs["go"].process(["south"]), testStateSWboundary);
+    test_states_are_equal(verbs["go"].process(["west"]), testStateSWboundary);
+    test_states_are_equal(verbs["go"].process(["east"]), testStateSE);
+    test_states_are_equal(verbs["go"].process(["east"]), testStateSEboundary);
+    test_states_are_equal(verbs["go"].process(["south"]), testStateSEboundary);
+    test_states_are_equal(verbs["go"].process(["north"]), testStateNE);
+    test_states_are_equal(verbs["go"].process(["north"]), testStateNEboundary);
+    test_states_are_equal(verbs["go"].process(["east"]), testStateNEboundary);
+    
+
+    
+    
+    // unpackGameStateIntoString
+    test_are_equal(unpackGameStateIntoString(gameState), "It is pitch-black...\n");
+
+    console.log("unit tests successful");
+}

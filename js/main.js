@@ -25,13 +25,12 @@
 var logArray = [];
 var logHistoryArray = [];
 var verbs = [];
+var testNouns = ["north", "south", "east", "west", "radio", "item"]; 
 var items = [];
 var rooms = [];
 var sounds = [];
 var audioId = [];
-var inventory = [];
-var directionNouns = ["NORTH", "SOUTH", "EAST", "WEST"];
-var timeValues = {minute: "1", minutes: "1", hour: "60", hours: "60"};
+var directionNouns = ["north", "south", "east", "west"];
 var currentAudio;
 var previousVolume;
 var previousRoom = "se";

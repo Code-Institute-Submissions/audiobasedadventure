@@ -19,20 +19,23 @@
     <!--main js sheet-->
     <script src="js/main.js"></script>
 
+    <!--tests-->
+    <script src="js/tests.js"></script>
+
     <!--audio_files.js-->
     <script src="js/audio_files.js"></script>
-
-    <!--change_room.js-->
-    <script src="js/change_room.js"></script>
-
-    <!--core_verbs.js-->
-    <script src="js/core_verbs.js"></script>
 
     <!--items.js-->
     <script src="js/items.js"></script>
 
     <!--rooms-->
     <script src="js/rooms.js"></script>
+
+    <!--game state.js-->
+    <script src="js/game_state.js"></script>
+    
+    <!--verbs.js-->
+    <script src="js/verbs.js"></script>
 
     <!--text_engine.js-->
     <script src="js/text_engine.js"></script>
@@ -50,7 +53,7 @@
 
 
 
-<body onload="printToLog(currentRoom.description); playCurrentRoomAudio()">
+<body onload="unitTesting(); acceptUserInput()">
 
     <div class="container">
 
@@ -58,7 +61,7 @@
         <textarea id="console" class="console" disabled></textarea>
 
         <!--user input form: submits on enter-->
-        <form id="myForm" name="answerForm" onsubmit="processUserInput(); this.reset(); return false;" action="#">
+        <form id="myForm" name="answerForm" onsubmit="acceptUserInput(); this.reset(); return false;" action="#">
             <!--hidden by default-->
             <input type="text" name="userInput" id="userInput" placeholder="your response..." autofocus autocomplete="off" visibility="hidden"></input>
         </form>

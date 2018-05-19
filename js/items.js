@@ -5,12 +5,10 @@ items. Item objects are at the bottom of this script. */
 
 // RADIO ON --------------------------------------------------------------------------------------
 
-function radioOn() {
-    
-    
-    // if the radio has no batteries
-    if(!items["radio"].usable) {
-        
+function radioOn() 
+{
+    if(!items["radio"].usable) 
+    {
         printToLog("You try to switch on the radio but nothing happens.");
         return;
     }
