@@ -25,7 +25,7 @@
 var logArray = [];
 var logHistoryArray = [];
 var verbs = [];
-var testNouns = ["north", "south", "east", "west", "radio", "item"]; 
+var itemVerbs = [];
 var items = [];
 var rooms = [];
 var sounds = [];

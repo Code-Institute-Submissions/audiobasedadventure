@@ -2,10 +2,10 @@
 
 // go ---------------------------------------------------------------------------------------------
 
-function go(directionNoun) {
+function go(userNouns) {
 
-    if (directionNoun[0] in gameState.currentRoom.keyRoomDict) {
-        var roomToChangeTo = gameState.currentRoom.keyRoomDict[directionNoun[0]];
+    if (userNouns[0] in gameState.currentRoom.keyRoomDict) {
+        var roomToChangeTo = gameState.currentRoom.keyRoomDict[userNouns[0]];
 
         if (rooms[roomToChangeTo] instanceof Object) {
             gameState.actionResponse = "";
@@ -20,11 +20,11 @@ function go(directionNoun) {
 
 // examine ----------------------------------------------------------------------------------------
 
-function examine(itemNoun) {
+function examine(userNouns) {
 
-    for (var i = 0; i < gameState.currentRoom.interactableItems.length; i++) {
-        var itemToExamine = gameState.currentRoom.interactableItems[i];
-        if (itemToExamine.itemName == itemNoun[0]) {
+    for (var i = 0; i < gameState.currentRoom.itemsInRoom.length; i++) {
+        var itemToExamine = gameState.currentRoom.itemsInRoom[i];
+        if (itemToExamine.itemName == userNouns[0]) {
             if (!itemToExamine.identified) {
                 gameState.actionResponse = "You cannot examine an item until you have identified it.";
             }
@@ -34,21 +34,21 @@ function examine(itemNoun) {
             return gameState;
         }
     }
-    gameState.actionResponse = "There is no " + itemNoun + " to examine.";
+    gameState.actionResponse = "There is no " + userNouns[0] + " to examine.";
     return gameState;
 }
 
 //  explore ---------------------------------------------------------------------------------------
 
-function explore(surroundings) {
+function explore(userNouns) {
 
-    if (surroundings[0] != "surroundings") {
+    if (userNouns[0] != "surroundings") {
         gameState.actionResponse = "You can only explore 'surroundings'.";
     }
     else {
         gameState.actionResponse = "You use your hands to explore your surroundings.\n";
-        for (var i = 0; i < gameState.currentRoom.interactableItems.length; i++) {
-            var itemToExplore = gameState.currentRoom.interactableItems[i]
+        for (var i = 0; i < gameState.currentRoom.itemsInRoom.length; i++) {
+            var itemToExplore = gameState.currentRoom.itemsInRoom[i]
             gameState.actionResponse += itemToExplore.interactions["explore"];
         }
     }
@@ -57,12 +57,12 @@ function explore(surroundings) {
 
 // identify ---------------------------------------------------------------------------------------
 
-function identify(userGuess) {
+function identify(userNouns) {
 
-    for (var i = 0; i < gameState.currentRoom.interactableItems.length; i++) {
-        var itemToIdentify = gameState.currentRoom.interactableItems[i];
-        if (itemToIdentify.itemName != userGuess[0]) {
-            gameState.actionResponse = "There is no " + userGuess[0] + " in the room.";
+    for (var i = 0; i < gameState.currentRoom.itemsInRoom.length; i++) {
+        var itemToIdentify = gameState.currentRoom.itemsInRoom[i];
+        if (itemToIdentify.itemName != userNouns[0]) {
+            gameState.actionResponse = "There is no " + userNouns[0] + " in the room.";
         }
         else if (!itemToIdentify.identified) {
             itemToIdentify.identified = true;
@@ -77,43 +77,67 @@ function identify(userGuess) {
 
 // take -------------------------------------------------------------------------------------------
 
-function take(itemNoun) {
+function take(userNouns) {
 
-    for (var i = 0; i < gameState.currentRoom.interactableItems.length; i++) {
+    for (var i = 0; i < gameState.currentRoom.itemsInRoom.length; i++) {
 
-        var itemToTake = gameState.currentRoom.interactableItems[i];
+        var itemToTake = gameState.currentRoom.itemsInRoom[i];
         if (!itemToTake.identified) {
             gameState.actionResponse = "You cannot take an item until you have identified it.";
             return gameState;
         }
-        else if (itemToTake.itemName == itemNoun[0]) {
-            gameState.actionResponse = "You take the " + itemNoun[0] + ". \n(You can look inside your inventory by entering 'inventory')";
-            gameState.inventory.push(items[itemNoun]);
+        else if (itemToTake.itemName == userNouns[0]) {
+            gameState.actionResponse = "You take the " + userNouns[0] + ". \n(You can look inside your inventory by entering 'inventory')";
+            gameState.inventory.push(items[userNouns[0]]);
+            // can this be cleaned up?
+            gameState.currentRoom.itemsInRoom.splice(gameState.currentRoom.itemsInRoom.indexOf(userNouns[0], 1));
             return gameState;
         }
     }
-    gameState.actionResponse = "There is no " + itemNoun[0] + " in the room.";
+    gameState.actionResponse = "There is no " + userNouns[0] + " in the room.";
+    return gameState;
+}
+
+// drop -------------------------------------------------------------------------------------------
+
+function drop(userNouns) {
+
+    for (var i = 0; i < gameState.inventory.length; i++) {
+
+        var itemToDrop = gameState.inventory[i];
+        if (itemToDrop.itemName == userNouns[0]) {
+            gameState.actionResponse = "You drop the " + userNouns[0] + ". \n(The " + userNouns[0] + " is now in the room)";
+            gameState.currentRoom.itemsInRoom.push(items[userNouns[0]]);
+            // can this be cleaned up?
+            gameState.inventory.splice(gameState.inventory.indexOf(userNouns[0], 1));
+            return gameState;
+        }
+    }
+    gameState.actionResponse = "There is no " + userNouns[0] + " in your inventory.";
     return gameState;
 }
 
 // use --------------------------------------------------------------------------------------------
 
-function use(objectToUse) {
+function use(userNouns) {
 
-    for (var i = 0; i < currentRoom.interactableItems.length; i++) {
-        if (currentRoom.interactableItems[i].itemName == objectToUse[0]) {
-            if (currentRoom.interactableItems[i].identified) {
-                printToLog(currentRoom.interactableItems[i].interactions["use"]());
-                return;
+    var inventoryAndRoomItemsCombined = gameState.currentRoom.itemsInRoom.concat(gameState.inventory);
+
+    for (var i = 0; i < inventoryAndRoomItemsCombined.length; i++) {
+
+        var itemToUse = inventoryAndRoomItemsCombined[i];
+        if (itemToUse.itemName == userNouns[0]) {
+            if (!itemToUse.identified) {
+                gameState.actionResponse = "You cannot use an item until you have identified what it is.";
             }
             else {
-                printToLog("You cannot use an item until you have identified what it is.");
-                return;
+                gameState = itemToUse.interactions["use"]();
             }
         }
+        return gameState;
     }
-    printToLog("There is no " + objectToUse[0] + " in the room or in your inventory.");
-    return;
+    gameState.actionResponse = "There is no " + userNouns[0] + " in the room or in your inventory.";
+    return gameState;
 }
 
 // inventory --------------------------------------------------------------------------------------
@@ -136,64 +160,58 @@ function showInventory() {
 
 //  restart ---------------------------------------------------------------------------------------
 
+function restart() {
 
-// TURN FUNCTION ----------------------------------------------------------------------------------
+    loadItems();
+    loadRooms();
+    loadGameState();
 
-function turn(objectAndDirectionToTurn) {
-    if (objectAndDirectionToTurn.length == 2) {
-        printToLog("You must use two words with 'turn' (object to turn and direction to turn')");
-    }
-    for (var i = 0; i < currentRoom.interactableItems.length; i++) {
-        if ((currentRoom.interactableItems[i].itemName == objectAndDirectionToTurn[0]) && ("turn" in currentRoom.interactableItems[i].interactions)) {
-            if (objectAndDirectionToTurn[1] in currentRoom.interactableItems[i].interactions["turn"]) {
-                tapFunction(objectAndDirectionToTurn[1]);
-            }
-            printToLog("You cannot turn this direction.")
-        }
-    }
+    return gameState;
 }
-//  -----------------------------------------------------------------------------------------------
-
-
 
 
 // VERBS  =========================================================================================
 
-let verb = function(verbName, process) {
+let verb = function(verbName, expectedNumberOfArgs, process) {
     this.verbName = verbName;
+    this.expectedNumberOfArgs = expectedNumberOfArgs;
     this.process = process;
 };
 
-verbs["go"] = new verb("go", function(secondWord) {
-    return go(secondWord);
+verbs["go"] = new verb("go", 1, function(userNouns) {
+    return go(userNouns);
 });
 
-verbs["examine"] = new verb("examine", function(secondWord) {
-    return examine(secondWord);
+verbs["examine"] = new verb("examine", 1, function(userNouns) {
+    return examine(userNouns);
 });
 
-verbs["explore"] = new verb("explore", function(secondWord) {
-    return explore(secondWord);
+verbs["explore"] = new verb("explore", 1, function(userNouns) {
+    return explore(userNouns);
 });
 
-verbs["identify"] = new verb("identify", function(secondWord) {
-    return identify(secondWord);
+verbs["identify"] = new verb("identify", 1, function(userNouns) {
+    return identify(userNouns);
 });
 
-verbs["take"] = new verb("take", function(secondWord) {
-    return take(secondWord);
+verbs["take"] = new verb("take", 1, function(userNouns) {
+    return take(userNouns);
 });
 
-verbs["use"] = new verb("use", function(secondWord) {
-    return use(secondWord);
+verbs["drop"] = new verb("drop", 1, function(userNouns) {
+    return drop(userNouns);
 });
 
-verbs["inventory"] = new verb("inventory", function() {
+verbs["use"] = new verb("use", 1, function(userNouns) {
+    return use(userNouns);
+});
+
+verbs["inventory"] = new verb("inventory", 0, function() {
     return showInventory();
 });
 
-verbs["turn"] = new verb("turn", function(secondWord, thirdWord) {
-    turn(secondWord, thirdWord);
-})
+verbs["restart"] = new verb("restart", 0, function() {
+    return restart();
+});
 
 //  ===============================================================================================

@@ -10,9 +10,17 @@ function acceptUserInput() {
     var userVerb = userInputWords[0];
     var userNouns = userInputWords.slice(1, userInputWords.length);
 
-    if (userVerb in verbs) {
-        gameState = verbs[userInputWords[0]].process(userNouns);
-    }
+    gameState = processUserInput(userVerb, userNouns);
+
+    // CORE VERBS ARE WORKING BUT I NEED HELP MAKING THE ITEM VERBS WORK.
+
+    // var inventoryAndRoomItemsCombined = gameState.currentRoom.itemsInRoom.concat(gameState.inventory);
+    // for (var i = 0; i < inventoryAndRoomItemsCombined.length; i++) {
+    //     if (userNouns[0] == inventoryAndRoomItemsCombined[i].name && userVerb in inventoryAndRoomItemsCombined[i].interactions) {
+    //         gameState = inventoryAndRoomItemsCombined[i].interactions[userVerb].process(userNouns);
+    //     }
+    // }
+
     var gameStateAsString = unpackGameStateIntoString(gameState);
     printGameStateToUser(gameStateAsString);
 }
@@ -50,11 +58,25 @@ function parser(userInputWords) {
     return userInputWords;
 }
 
+// processUserInput ===============================================================================
+
+function processUserInput(userVerb, userNouns) {
+    if (userVerb in verbs) {
+        if (userNouns.length == verbs[userVerb].expectedNumberOfArgs) {
+            gameState = verbs[userVerb].process(userNouns);
+        }
+        else {
+            gameState.actionResponse = "Expected number of arguments when using '" + userVerb + "': " + verbs[userVerb].expectedNumberOfArgs;
+        }
+    }
+    return gameState;
+}
+
 // unpackGameStateIntoString ======================================================================
 
 function unpackGameStateIntoString(gameState) {
     var gameStateAsString = gameState.currentRoom.description;
-    gameStateAsString.concat(gameState.actionResponse);
+    gameStateAsString = gameStateAsString.concat(gameState.actionResponse);
     return gameStateAsString;
 }
 
@@ -63,63 +85,4 @@ function unpackGameStateIntoString(gameState) {
 
 function printGameStateToUser(stringToPrint) {
     document.getElementById("console").innerHTML = stringToPrint;
-}
-
-// unitTesting ====================================================================================
-
-function unitTesting() {
-
-    // deleteUnwantedWords
-    test_arrays_are_equal(deleteUnwantedWords(["hello"]), ["hello"]);
-    test_arrays_are_equal(deleteUnwantedWords(["use", "the", "radio"]), ["use", "radio"]);
-    test_arrays_are_equal(deleteUnwantedWords(["go", "to", "the", "north"]), ["go", "north"]);
-
-    // parser
-    test_arrays_are_equal(parser(["hello"]), ["hello"]);
-    test_arrays_are_equal(parser(["use", "radio"]), ["use", "radio"]);
-    test_arrays_are_equal(parser(["head", "north"]), ["go", "north"]);
-    test_arrays_are_equal(parser(["move", "north"]), ["go", "north"]);
-    test_arrays_are_equal(parser(["walk", "north"]), ["go", "north"]);
-    test_arrays_are_equal(parser(["travel", "north"]), ["go", "north"]);
-    test_arrays_are_equal(parser(["run", "north"]), ["go", "north"]);
-
-    // verbs
-    test_states_are_equal(verbs["go"].process(["north"]), testStateNE);
-    test_states_are_equal(verbs["go"].process(["south"]), testStateSE);
-    test_states_are_equal(verbs["go"].process(["west"]), testStateSW);
-    test_states_are_equal(verbs["go"].process(["north"]), testStateNW);
-    test_states_are_equal(verbs["go"].process(["north"]), testStateNWboundary);
-    test_states_are_equal(verbs["go"].process(["west"]), testStateNWboundary);
-    test_states_are_equal(verbs["go"].process(["south"]), testStateSW);
-    test_states_are_equal(verbs["go"].process(["south"]), testStateSWboundary);
-    test_states_are_equal(verbs["go"].process(["west"]), testStateSWboundary);
-    test_states_are_equal(verbs["go"].process(["east"]), testStateSE);
-    test_states_are_equal(verbs["go"].process(["east"]), testStateSEboundary);
-    test_states_are_equal(verbs["go"].process(["south"]), testStateSEboundary);
-    test_states_are_equal(verbs["go"].process(["north"]), testStateNE);
-    test_states_are_equal(verbs["go"].process(["north"]), testStateNEboundary);
-    test_states_are_equal(verbs["go"].process(["east"]), testStateNEboundary);
-
-    test_states_are_equal(verbs["explore"].process(["something"]), testStateExploreNEsomething);
-    test_states_are_equal(verbs["explore"].process(["surroundings"]), testStateExploreNE);
-    test_states_are_equal(verbs["go"].process(["south"]), testStateSE);
-    test_states_are_equal(verbs["explore"].process(["surroundings"]), testStateExploreSE);
-
-    test_states_are_equal(verbs["examine"].process(["radio"]), testStateRadioUnidentified);
-    test_states_are_equal(verbs["take"].process(["radio"]), testStateTakeRadioUnidentified);
-    test_states_are_equal(verbs["examine"].process(["door"]), testStateDoor);
-    
-    test_states_are_equal(verbs["identify"].process(["door"]), testStateIdentifyDoor);
-    test_states_are_equal(verbs["identify"].process(["radio"]), testStateIdentifyRadio);
-    test_states_are_equal(verbs["identify"].process(["radio"]), testStateIdentifyRadioAgain);
-    
-    test_states_are_equal(verbs["take"].process(["door"]), testStateTakeDoor);
-    test_states_are_equal(verbs["inventory"].process(), testStateInventory);
-    test_states_are_equal(verbs["take"].process(["radio"]), testStateTakeRadio);
-    test_states_are_equal(verbs["inventory"].process(), testStateInventoryRadio);
-
-    // unpackGameStateIntoString
-    test_are_equal(unpackGameStateIntoString(gameState), "It is pitch-black...\n");
-
-    console.log("unit tests successful");
 }
