@@ -8,24 +8,42 @@
 var footsteps_1 = new Howl({
     src: ['audio/footsteps_1.m4a'],
     loop: false,
-    volume: .2
+    volume: .1
 });
 
 var footsteps_2 = new Howl({
     src: ['audio/footsteps_2.m4a'],
     loop: false,
-    volume: .2
+    volume: .1
 });
 
 var footsteps_3 = new Howl({
     src: ['audio/footsteps_2.m4a'],
     loop: false,
-    volume: .2
+    volume: .1
 });
 
 var footstepsArray = [footsteps_1, footsteps_2, footsteps_3]
 
 // ------------------------------------------------------------------------------------------------
+
+var piano = new Howl({
+    src: ['audio/piano.m4a'],
+    loop: false,
+    volume: 0.2
+});
+
+var radio_fall = new Howl({
+    src: ['audio/radio_fall.mp3'],
+    loop: false,
+    volume: 0.2, 
+});
+
+var rolling_batteries = new Howl({
+    src: ['audio/rolling_batteries.mp3'],
+    loop: false,
+    volume: 0.2, 
+});
 
 var waterDrops = new Howl({
     src: ['audio/waterDrops.mp3'],
@@ -94,6 +112,7 @@ sounds["radioStatic"] = new soundObject([radioStatic], [8, 29], true);
 
 function playStartingSounds() {
     // waterDrops.play()
+    piano.play()
 }
 
 // ------------------------------------------------------------------------------------------------

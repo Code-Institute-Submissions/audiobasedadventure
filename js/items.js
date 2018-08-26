@@ -1,50 +1,65 @@
 // items  =========================================================================================
 
-let item = function(itemName, interactions, identified, itemDescription, usable, on) {
+let item = function(itemName, interactions, usable, on) {
     this.itemName = itemName;
     this.interactions = interactions;
-    this.identified = identified;
-    this.itemDescription = itemDescription;
     this.usable = usable;
     this.on = on;
 };
 
 function loadItems() {
 
-    items["radio"] = new item(
+    items["radio"]
+    = new item(
         "radio", {
+            
             // interactions
-            explore: "You run your hands over a plastic device with pushable buttons and twistable knobs.",
-            identify: "You identify a radio in the room.",
+            explore: "You run your hands over a plastic device on the floor with pushable buttons and twistable knobs.",
             examine: "You can turn the radio on and off and you can turn the knob of the radio clockwise or anti-clockwise.",
-            // use is switching on an off the radio
+            
+            // use is switching on and off the radio
             use: function() {
-                return radioOn();
+                if (!items["radio"].usable) {
+                    gameState.actionResponse = "You try to switch on the radio but nothing happens. It must need power...";
+                    return gameState;
+                }
             },
-            turn: {
-                clockwise: "clockwise",
-                anticlockwise: "You turn the knob anti-clockwise."
-            }
         },
-        false,
-        "There is a radio in the room.",
         false,
         false);
 
     items["batteries"] = new item(
-        "batteries", {
-            // interactions
+        "batteries", 
+        {
+        // interactions -----------------------------------------------------------------------
+            
             explore: "You run your hands over two small cylindrical items.",
             identify: "You identify batteries.",
             examine: "Two batteries.",
-            // use is switching on an off the radio
+            
+            //  use batteries ----------------------------------------------------------------------
+            
             use: function() {
-                return useBatteries();
+
+                for (var i = 0; i < gameState.inventory.length; i++) {
+                    if (gameState.inventory[i] == items["batteries"]) {
+                        gameState.actionResponse = "You can't use the batteries on their own. Try putting the batteries in another item.";
+                        return gameState;
+                    } 
+                }
+                gameState.actionResponse = "You can't use the batteries unless they are in your inventory.";
+                return gameState;
             },
-            put: itemVerbs["putBatteriesInRadio"]
+            
+            // putBatteriesInRadio ----------------------------------------------------------------
+            
+            put: function(target) {
+                if (target == "radio") {
+                    gameState.actionResponse = "You put the batteries inside the radio.";
+                }
+                return gameState;
+            },
         },
-        false,
-        "There are batteries in the room.",
         true,
         false);
 }

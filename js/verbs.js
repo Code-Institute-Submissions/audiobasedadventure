@@ -14,6 +14,9 @@ function go(userNouns) {
             // plays one footstep audio file from an array of three.
             var randomFootsteps = footstepsArray[Math.floor(Math.random()*footstepsArray.length)];
             randomFootsteps.play()
+            
+            gameState.currentRoom.onEnter();
+            console.log(gameState.currentRoom.name)
         }
         else {
             gameState.actionResponse = roomToChangeTo;
@@ -59,26 +62,6 @@ function explore(userNouns) {
     return gameState;
 }
 
-// identify ---------------------------------------------------------------------------------------
-
-function identify(userNouns) {
-
-    for (var i = 0; i < gameState.currentRoom.itemsInRoom.length; i++) {
-        var itemToIdentify = gameState.currentRoom.itemsInRoom[i];
-        if (itemToIdentify.itemName != userNouns[0]) {
-            gameState.actionResponse = "There is no " + userNouns[0] + " in the room.";
-        }
-        else if (!itemToIdentify.identified) {
-            itemToIdentify.identified = true;
-            gameState.actionResponse = itemToIdentify.interactions["identify"];
-        }
-        else {
-            gameState.actionResponse = itemToIdentify.itemName.charAt(0).toUpperCase() + itemToIdentify.itemName.slice(1) + " has already been identified";
-        }
-    }
-    return gameState;
-}
-
 // take -------------------------------------------------------------------------------------------
 
 function take(userNouns) {
@@ -86,11 +69,8 @@ function take(userNouns) {
     for (var i = 0; i < gameState.currentRoom.itemsInRoom.length; i++) {
 
         var itemToTake = gameState.currentRoom.itemsInRoom[i];
-        if (!itemToTake.identified) {
-            gameState.actionResponse = "You cannot take an item until you have identified it.";
-            return gameState;
-        }
-        else if (itemToTake.itemName == userNouns[0]) {
+
+        if (itemToTake.itemName == userNouns[0]) {
             gameState.actionResponse = "You take the " + userNouns[0] + ". \n(You can look inside your inventory by entering 'inventory')";
             gameState.inventory.push(items[userNouns[0]]);
             // can this be cleaned up?
@@ -131,12 +111,7 @@ function use(userNouns) {
 
         var itemToUse = inventoryAndRoomItemsCombined[i];
         if (itemToUse.itemName == userNouns[0]) {
-            if (!itemToUse.identified) {
-                gameState.actionResponse = "You cannot use an item until you have identified what it is.";
-            }
-            else {
-                gameState = itemToUse.interactions["use"]();
-            }
+            gameState = itemToUse.interactions["use"]();
         }
         return gameState;
     }
