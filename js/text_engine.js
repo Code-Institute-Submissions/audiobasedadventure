@@ -1,6 +1,9 @@
 // acceptUserInput ==================================================================================
 
+
 function acceptUserInput() {
+
+    playStartingSounds()
 
     var userInput = document.getElementById("userInput").value.toLowerCase();
     var userInputWords = userInput.split(" ");

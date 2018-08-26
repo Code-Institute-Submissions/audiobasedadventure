@@ -10,6 +10,10 @@ function go(userNouns) {
         if (rooms[roomToChangeTo] instanceof Object) {
             gameState.actionResponse = "";
             gameState.currentRoom = rooms[roomToChangeTo];
+            
+            // plays one footstep audio file from an array of three.
+            var randomFootsteps = footstepsArray[Math.floor(Math.random()*footstepsArray.length)];
+            randomFootsteps.play()
         }
         else {
             gameState.actionResponse = roomToChangeTo;
