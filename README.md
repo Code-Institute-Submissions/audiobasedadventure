@@ -13,169 +13,32 @@ This project is built using HTML5, CSS, and JavaScript (jQuery, Howler JS). The 
 
 Live version: https://e-commerce-johnpooch.herokuapp.com/
 
-## Getting Started
+### UX Design
+The UX design is deliberately simplistic. The lack of instructions encourages players to experiment with different commands. While this design approach would not suit other applications, the enjoyment of playing a TBA often comes from the cryptic nature of the game. Traditionally, TBAs have minimal instructions and players are expected to work out how the system works.
 
-Follow these instructions to run the game locally. 
+Visually the design is meant to evoke a sense of mystery and unease.
 
-### Installation
+### Features
 
-Clone this workspace and install the required software:
+* Multiple commands: 'go', 'take', 'use', 'examine', 'inventory'
+* User input is parsed so that commands like 'pickup the shovel' and 'take shovel' both result in the same outcome.
+* Audio feedback occurs when certain actions are carried out.
 
-```
-$ pip3 install -r requirements.txt
-```
+### Testing
 
-or if you're using Cloud9:
+Manual testing was done to ensure:
+* The game plays as intended
+* Parsing worked as expected
 
-```
-$ sudo pip3 install -r requirements.txt
-```
+## Deployment
+The site is hosted on github pages.  
 
-You should now be able to run the site locally. There will be no products on the site.
+### Run locally
+To run this site locally, in your terminal enter: git clone https://github.com/mparkcode/chicken_cha_cha
 
-```
-$ python3 manage.py runserver $IP:<PORT>
-```
-
-### Running the tests
-
-To carry out the automated tests:
-
-```
-$ python3 manage.py test
-```
-
-## Scraping from original Some Neck website
-A total of 313 products, including prices, descriptions, images, manufacturer, etc., were scraped from the original Some Neck website using Beautiful Soup 4. This functionality is conatined within products/scrape.py and could be run in the django command shell using one function call. The code worked through every page of products on the website and was able to handle pagination. 
-
-Code in action:
-
-<img src="/source/images/Screen Shot 2018-08-25 at 15.12.49.png?raw=true"/>
-
-## Automatic posting to Twitter and Facebook
-One of the features in this project is the ability to automatically post a product to Facebook and Twitter when uploading a product. This means that the shop owner can more easily manage the social media of the shop. Dummy Twitter and Facebook accounts were made to demonstrate the feature.
-
-#### Twitter account with no posts - pre-upload:
-<img src="/source/images/Screen Shot 2018-08-26 at 11.54.52.png?raw=true"/>
-
-#### Facebook account with no posts - pre-upload:
-<img src="/source/images/Screen Shot 2018-08-26 at 11.55.35.png?raw=true"/>
-
-#### Upload form:
-<img src="/source/images/Screen Shot 2018-08-26 at 12.02.10 (2).png?raw=true"/>
-
-#### Social media form:
-<img src="/source/images/Screen Shot 2018-08-26 at 12.05.17.png?raw=true"/>
-
-#### Twitter after upload:
-<img src="/source/images/Screen Shot 2018-08-26 at 12.06.12.png?raw=true"/>
-
-#### Facebook after upload: 
-<img src="/source/images/Screen Shot 2018-08-26 at 12.10.18.png?raw=true"/>
-
-
-
-## Issues with the original website
-
-#### Original website has a lacklustre design
-The design of the original website is somewhat dull. There are large areas with monochrome and textureless backgrounds. 
-
-A large proportion of the navbar is occupied by a banner showing the number of items in the cart and the total value of the cart items. Because of the value of the products, most users on the site would not be making purchases directly from the site. As such, this banner is unnecessarily large.
-
-###### Solution
-Textured backgrounds, borders, shadows, responsiveness, and other stylistic elements were used in this project to bring life to the website. The design of the site is a work in progress. 
-
-#### Original website does not have users/accounts
-Returning customers cannot create accounts on the site. This means that users can't save products which they like or comment on products, etc. 
-
-###### Solution
-This project has a users and accounts. The functionality of the users/accounts system has not been fully developed.
-
-#### Original website has defunct blog section
-While the original website has a blog section, the blog has only one post which was posted in 2015. The shop is regularly visited by internationally renowned musicians. The shop also carry out repairs on rare guitars. If the shop posted to its blog about how to maintain rare guitars or about celebrities visiting the shop, this could result in greater traffic to the website.
-
-###### Solution
-This project has a re-designed blog/news section which included more posts and is more appealing to read.
-
-#### Original website does not have a search feature
-The original Some Neck Guitars website does not have a search feature. The website has around 400 products on it. As such it can be difficult to determine whether the shop has the specific product you're be looking for. The website has a 'sort by' feature which orders the products, and a 'filter by brand' feature which displays only products of a given manufacturer. A search bar is a more intuitive way of filtering products.
-
-###### Solution
-This project features a search bar. The search bar can be used in conjunction with the 'sort by' and 'filter by' features. 
-
-#### 'Sort by' options are not intuitive
-On the original site, the 'sort by' options are not intuitive. 
-
-The 'Newest to Oldest' option orders the products by the date at which they were uploaded to the site. Given that the shop specialises in vintage and used guitars, it would make more sense to order the products by the year of manufacturing. This would allow users to look at older guitars or newer guitars.
-
-The 'Best Selling' option is redundant because the products on the site are unique.
-
-###### Solution
-In this project, the 'Newest to Oldest' option orders the products by the year of manufacturing. Another option called recently added is included to see products that habve been recently added to the page. The 'Best Selling' feature is removed. 
-
-#### Original website contact and about pages are virtually identical
-The 'contact us' and 'about' pages on the original website are almost identical. The only difference between the two pages is that the 'contact us' page features a Google map. This creates the impression of the website being unprofessional. 
-
-###### Solution
-This project doesn't have an 'about' page at present. In the future an 'about' page will be added which will be entirely separate from the 'contact us' page.
-
-#### Original website doesn't have a browser image
-The original website does not have an image in the browser tab. This is a simple feature to implement which improves the appearance of the site.
-
-###### Solution
-In this project the profile image of the Some Neck Facebook page was used as a browser icon.
-
-## Current Issues
-
-The project has a number of issues which could not be resolved because of time constraints.
-
-#### Cluttered navbar
-The navbar on the site is a bit cluttered especially on smaller displays. By using collapsable lists, the navbar could be cleaner. 
-
-#### Missing footer section
-The page does not have a footer section. This section should feature a mini navbar and contact details. The section could also include links to social media. 
-
-#### Blog to News
-Originally, the news section was intended to be a blog. Half way through development it was decided that it would be a news section. This section is called 'blog' and 'news' in the code. This is misleading to other developers. The naming should be standardised.
-
-#### Confirmation page is unfinished
-After making a purchase, users are redirected to a confirmation page. This page is unfinished. When the page is finished it should present the user with the product(s) that have just been purchased as well as the billing details of the purchase so that the user can review the details of the purchase.
-
-#### Contact Form doesn't work
-The contact form exists and is styled but the form doesn't get submitted anywhere.
-
-#### Dark Appearance
-The design of the 'product_by_type' pages rely on dark background textures. I feel that this makes the page less appealing to look at and makes the information harder to read. A brighter background texture would imporve these pages.
-
-#### Screen Size issues
-On smaller laptops, the navbar section becomes increasingly cluttered. While the site is mobile-responsive, it does not work well with small laptop screens. Media queries should be used to address this.
-
-#### Facebook and Twitter
-The feature which posts to Facebook and Twitter only allows for a caption and a link. The shop owner might want to tag other Facebook and Twitter users or might want to include hashtags or emojis. A more fully featured posting system would be useful.
-
-#### Posting old products to Facebook and Twitter
-At present, the shop owner can only post new products to Facebook and Twitter. The shop owner might want to post older products to facebook or twitter as well. This should be a feature. 
-
-## Future Development Plans
-
-#### Dynamic Search
-A dynamic search feature which presents search results in real time would be a good feature to add. This would probably rely on AJAX. 
-
-#### Messaging system shop
-A feature whereby users could contact the shop in real time would be useful. This would also use AJAX. 
-
-#### Accounts features
-Users/accounts have very little functionality in the project at present. Features like wish-lists, commenting, recommendations, etc. should be introduced.
+### Acknowledgements
+The desing of the game borrows from Ron Schnell's 'Dunnet'
 
 ## Built With
 
-* [Django](https://www.djangoproject.com/) - The Django web framework.
-* [AWS S3](https://console.aws.amazon.com/s3/) - Used to store media for Heroku version. 
-* [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/) - Used to scrape original Some Neck Website.
-* [Stripe](https://stripe.com/gb) - Used to handle payments.
-
-## Acknowledgments
-
-* Sentdex's video series on working with Beautiful Soup: https://www.youtube.com/watch?v=aIPqt-OdmS0
-
-
+* [Howler JS](https://howlerjs.com/) - JS audio library.
