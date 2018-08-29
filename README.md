@@ -11,7 +11,7 @@ This project is built using HTML5, CSS, and JavaScript (jQuery, Howler JS). The 
 
 ### Live Version
 
-Live version: https://e-commerce-johnpooch.herokuapp.com/
+Live version: https://johnpooch.github.io/audiobasedadventure/
 
 ### UX Design
 The UX design is deliberately simplistic. The lack of instructions encourages players to experiment with different commands. While this design approach would not suit other applications, the enjoyment of playing a TBA often comes from the cryptic nature of the game. Traditionally, TBAs have minimal instructions and players are expected to work out how the system works.
@@ -30,11 +30,19 @@ Manual testing was done to ensure:
 * The game plays as intended
 * Parsing worked as expected
 
-## Deployment
-The site is hosted on github pages.  
+### Issues
 
-### Run locally
-To run this site locally, in your terminal enter: git clone https://github.com/mparkcode/chicken_cha_cha
+##### Short length
+The game is very short and features very little in terms of actual game play. Building the engine for the game took a long time. The code is scalable so it will be possible to extend the game easily.
+
+##### Audio game mechanic
+The initial idea for the game was to use audio playback as a source of feedback for the player. This hasn't been implemented yet. A system has been built which means that audio sources have a distance from the player and a directionality. This could be used to guide players in specific directions or in other contexts.
+
+##### Procedural code
+The source code for this project represents a hybrid between procedural coding and OOP. Items and rooms are objects but verbs and commands are not. The gma ewould be more scalable and robust if more OOP coding was used.
+
+## Deployment
+The site is hosted on github pages. To run this site locally, in your terminal enter: git clone https://github.com/johnpooch/audiobasedadventure
 
 ### Acknowledgements
 The desing of the game borrows from Ron Schnell's 'Dunnet'
