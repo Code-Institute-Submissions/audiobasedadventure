@@ -3,13 +3,31 @@
 
 function acceptUserInput() {
 
+    // CLEAN
+
     var userInput = document.getElementById("userInput").value.toLowerCase();
     var userInputWords = userInput.split(" ");
     var userInputWordsCleaned = deleteUnwantedWords(userInputWords);
-    userInputWordsParsed = parser(userInputWordsCleaned);
+    var userInputWordsParsed = parser(userInputWordsCleaned);
+    
+    var userInputWordsFinal = [];
+    for (var i = 0; i < userInputWordsParsed.length; i ++ ) {
+        
+        var split = userInputWordsParsed[i].split(" ");
+        console.log(split);
+        
+        for(var j = 0; j < split.length; j ++) {
+            
+            userInputWordsFinal.push(split[j]);
+        }
+    }
 
-    var userVerb = userInputWords[0];
-    var userNouns = userInputWords.slice(1, userInputWords.length);
+    console.log(userInputWordsFinal)
+
+    var userVerb = userInputWordsFinal[0];
+    var userNouns = userInputWordsFinal.slice(1, userInputWordsFinal.length);
+    
+    console.log(userNouns)
 
     gameState = processUserInput(userVerb, userNouns);
 
@@ -46,7 +64,7 @@ function deleteUnwantedWords(userInputWords) {
 
 function parser(userInputWords) {
 
-    var wordReplacementPairs = { "head": "go", "walk": "go", "move": "go", "travel": "go", "run": "go" };
+    var wordReplacementPairs = { "head": "go", "walk": "go", "move": "go", "travel": "go", "run": "go", "dig": "use shovel" };
 
     for (var i = 0; i < userInputWords.length; i++) {
         if (userInputWords[i] in wordReplacementPairs) {
@@ -73,10 +91,20 @@ function processUserInput(userVerb, userNouns) {
     return gameState;
 }
 
+// getItemDescriptions ============================================================================
+
+function getItemDescriptions(gameState) {
+    var itemsString = "";
+    for(var i = 0; i < gameState.currentRoom.itemsInRoom.length; i ++) {
+        itemsString += gameState.currentRoom.itemsInRoom[i].description;
+    }
+    return itemsString;
+}
+
 // unpackGameStateIntoString ======================================================================
 
 function unpackGameStateIntoString(gameState) {
-    var gameStateAsString = gameState.currentRoom.description;
+    var gameStateAsString = gameState.currentRoom.name + gameState.currentRoom.description + getItemDescriptions(gameState);
     gameStateAsString = gameStateAsString.concat(gameState.actionResponse);
     return gameStateAsString;
 }

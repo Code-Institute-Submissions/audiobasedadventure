@@ -3,6 +3,6 @@
 var gameState;
 
 function loadGameState() {
-    gameState = { currentRoom: rooms["se"], inventory: [], actionResponse: "" };
+    gameState = { currentRoom: rooms["dead end"], inventory: [], actionResponse: "" };
 }
 loadGameState();

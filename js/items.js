@@ -1,13 +1,56 @@
 // items  =========================================================================================
 
-let item = function(itemName, interactions, usable, on) {
-    this.itemName = itemName;
+let item = function(name, description, interactions, takeAudio) {
+    this.name = name;
+    this.description = description;
     this.interactions = interactions;
-    this.usable = usable;
-    this.on = on;
+    this.takeAudio = takeAudio;
 };
 
 function loadItems() {
+    
+    // shovel -------------------------
+    
+    items["shovel"] = new item(
+        
+        // name -----------------------
+        "shovel", 
+        
+        // description ----------------
+        "There is a shovel here.\n", 
+        
+        // interactions ---------------
+        {
+            
+            // interactions
+            explore: "You run your hands over a plastic device on the floor with pushable buttons and twistable knobs.",
+            examine: "Its covered in moss. It must have been here for a long time...",
+            
+            // use is switching on and off the radio
+            use: function() {
+                if (gameState.currentRoom == rooms["opening"]) {
+                    
+                    if (!this.usedInOpening) {
+                        gameState.actionResponse = "You start digging...";
+                        dig_with_shovel.play();
+                        this.usedInOpening = true;
+                    } else {
+                        gameState.actionResponse = "You've already dug here. You found nothing.";
+                    }
+                }
+                else {
+                    gameState.actionResponse = "You cannot dig here.";
+                }
+            return gameState;
+            },
+        },
+        takeAudio = pick_up_shovel
+        );
+    
+    items["shovel"].usedInOpening = (false);
+    
+    
+    
 
     items["radio"]
     = new item(

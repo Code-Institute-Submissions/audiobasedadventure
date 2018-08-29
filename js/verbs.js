@@ -13,10 +13,7 @@ function go(userNouns) {
             
             // plays one footstep audio file from an array of three.
             var randomFootsteps = footstepsArray[Math.floor(Math.random()*footstepsArray.length)];
-            randomFootsteps.play()
-            
-            gameState.currentRoom.onEnter();
-            console.log(gameState.currentRoom.name)
+            randomFootsteps.play();
         }
         else {
             gameState.actionResponse = roomToChangeTo;
@@ -31,16 +28,11 @@ function examine(userNouns) {
 
     for (var i = 0; i < gameState.currentRoom.itemsInRoom.length; i++) {
         var itemToExamine = gameState.currentRoom.itemsInRoom[i];
-        if (itemToExamine.itemName == userNouns[0]) {
-            if (!itemToExamine.identified) {
-                gameState.actionResponse = "You cannot examine an item until you have identified it.";
-            }
-            else {
+        if (itemToExamine.name == userNouns[0]) {
                 gameState.actionResponse = itemToExamine.interactions["examine"];
             }
             return gameState;
         }
-    }
     gameState.actionResponse = "There is no " + userNouns[0] + " to examine.";
     return gameState;
 }
@@ -70,15 +62,20 @@ function take(userNouns) {
 
         var itemToTake = gameState.currentRoom.itemsInRoom[i];
 
-        if (itemToTake.itemName == userNouns[0]) {
+        if (itemToTake.name == userNouns[0]) {
             gameState.actionResponse = "You take the " + userNouns[0] + ". \n(You can look inside your inventory by entering 'inventory')";
             gameState.inventory.push(items[userNouns[0]]);
             // can this be cleaned up?
             gameState.currentRoom.itemsInRoom.splice(gameState.currentRoom.itemsInRoom.indexOf(userNouns[0], 1));
+            
+            if (itemToTake.takeAudio) {
+                itemToTake.takeAudio.play();
+            }
+            
             return gameState;
         }
     }
-    gameState.actionResponse = "There is no " + userNouns[0] + " in the room.";
+    gameState.actionResponse = "There is no " + userNouns[0] + " here.";
     return gameState;
 }
 
@@ -89,8 +86,8 @@ function drop(userNouns) {
     for (var i = 0; i < gameState.inventory.length; i++) {
 
         var itemToDrop = gameState.inventory[i];
-        if (itemToDrop.itemName == userNouns[0]) {
-            gameState.actionResponse = "You drop the " + userNouns[0] + ". \n(The " + userNouns[0] + " is now in the room)";
+        if (itemToDrop.name == userNouns[0]) {
+            gameState.actionResponse = "You drop the " + userNouns[0] + ". \n";
             gameState.currentRoom.itemsInRoom.push(items[userNouns[0]]);
             // can this be cleaned up?
             gameState.inventory.splice(gameState.inventory.indexOf(userNouns[0], 1));
@@ -110,12 +107,12 @@ function use(userNouns) {
     for (var i = 0; i < inventoryAndRoomItemsCombined.length; i++) {
 
         var itemToUse = inventoryAndRoomItemsCombined[i];
-        if (itemToUse.itemName == userNouns[0]) {
+        if (itemToUse.name == userNouns[0]) {
             gameState = itemToUse.interactions["use"]();
         }
         return gameState;
     }
-    gameState.actionResponse = "There is no " + userNouns[0] + " in the room or in your inventory.";
+    gameState.actionResponse = "There is no " + userNouns[0] + " nearby or in your inventory.";
     return gameState;
 }
 
@@ -131,7 +128,7 @@ function showInventory() {
         gameState.actionResponse = "You look inside your inventory:\n";
 
         for (var i = 0; i < gameState.inventory.length; i++) {
-            gameState.actionResponse += gameState.inventory[i].itemName.charAt(0).toUpperCase() + gameState.inventory[i].itemName.slice(1) + "\n";
+            gameState.actionResponse += gameState.inventory[i].name.charAt(0).toUpperCase() + gameState.inventory[i].name.slice(1) + "\n";
         }
         return gameState;
     }

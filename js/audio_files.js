@@ -6,26 +6,52 @@
 // footsteps --------------------------------------------------------------------------------------
 
 var footsteps_1 = new Howl({
-    src: ['audio/footsteps_1.m4a'],
+    src: ['audio/footsteps_1.mp3'],
     loop: false,
     volume: .1
 });
 
 var footsteps_2 = new Howl({
-    src: ['audio/footsteps_2.m4a'],
+    src: ['audio/footsteps_2.mp3'],
     loop: false,
     volume: .1
 });
 
 var footsteps_3 = new Howl({
-    src: ['audio/footsteps_2.m4a'],
+    src: ['audio/footsteps_2.mp3'],
     loop: false,
     volume: .1
 });
 
 var footstepsArray = [footsteps_1, footsteps_2, footsteps_3]
 
-// ------------------------------------------------------------------------------------------------
+// Ambient sounds ---------------------------------------------------------------------------------
+
+var forest_ambience = new Howl({
+    src: ['audio/forest_ambience_2.m4a'],
+    loop: true,
+    volume: .2
+});
+
+// Shovel -----------------------------------------------------------------------------------------
+
+var pick_up_shovel = new Howl({
+    src: ['audio/pick_up_shovel.mp3'],
+    loop: false,
+    volume: .5
+});
+
+var dig_with_shovel = new Howl({
+    src: ['audio/dig_with_shovel.mp3'],
+    loop: false,
+    volume: .4, 
+    onend: function() {
+        gameState.currentRoom.description += "Theres nothing here.\n";
+        gameState.actionResponse = "";
+        acceptUserInput();
+      }
+});
+
 
 var piano = new Howl({
     src: ['audio/piano.m4a'],
@@ -112,7 +138,9 @@ sounds["radioStatic"] = new soundObject([radioStatic], [8, 29], true);
 
 function playStartingSounds() {
     // waterDrops.play()
+    forest_ambience.play()
     piano.play()
+    
 }
 
 // ------------------------------------------------------------------------------------------------
