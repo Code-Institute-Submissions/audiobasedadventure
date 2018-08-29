@@ -46,10 +46,19 @@ var dig_with_shovel = new Howl({
     loop: false,
     volume: .4, 
     onend: function() {
-        gameState.currentRoom.description += "Theres nothing here.\n";
+        gameState.currentRoom.description += "You find a bunch of keys.\n";
+        items["keys"].discovered = true;
         gameState.actionResponse = "";
         acceptUserInput();
       }
+});
+
+// Keys -------------------------------------------------------------------------------------------
+
+var pick_up_keys = new Howl({
+    src: ['audio/pick_up_keys.mp3'],
+    loop: false,
+    volume: .5
 });
 
 

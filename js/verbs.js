@@ -19,16 +19,21 @@ function go(userNouns) {
             gameState.actionResponse = roomToChangeTo;
         }
     }
+    else {
+        gameState.actionResponse = "You can't go that way.";
+    }
     return gameState;
 }
 
 // examine ----------------------------------------------------------------------------------------
 
 function examine(userNouns) {
+    
+    var inventoryAndRoomItemsCombined = gameState.currentRoom.itemsInRoom.concat(gameState.inventory);
 
-    for (var i = 0; i < gameState.currentRoom.itemsInRoom.length; i++) {
-        var itemToExamine = gameState.currentRoom.itemsInRoom[i];
-        if (itemToExamine.name == userNouns[0]) {
+    for (var i = 0; i < inventoryAndRoomItemsCombined.length; i++) {
+        var itemToExamine = inventoryAndRoomItemsCombined[i];
+        if (itemToExamine.name == userNouns[0] && itemToExamine.discovered) {
                 gameState.actionResponse = itemToExamine.interactions["examine"];
             }
             return gameState;
@@ -62,7 +67,7 @@ function take(userNouns) {
 
         var itemToTake = gameState.currentRoom.itemsInRoom[i];
 
-        if (itemToTake.name == userNouns[0]) {
+        if (itemToTake.name == userNouns[0] && itemToTake.discovered) {
             gameState.actionResponse = "You take the " + userNouns[0] + ". \n(You can look inside your inventory by entering 'inventory')";
             gameState.inventory.push(items[userNouns[0]]);
             // can this be cleaned up?
@@ -109,10 +114,10 @@ function use(userNouns) {
         var itemToUse = inventoryAndRoomItemsCombined[i];
         if (itemToUse.name == userNouns[0]) {
             gameState = itemToUse.interactions["use"]();
+            return gameState;
         }
-        return gameState;
     }
-    gameState.actionResponse = "There is no " + userNouns[0] + " nearby or in your inventory.";
+    gameState.actionResponse = "There is no " + userNouns[0] + " nearby  or in your inventory.";
     return gameState;
 }
 

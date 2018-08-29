@@ -1,15 +1,16 @@
 // items  =========================================================================================
 
-let item = function(name, description, interactions, takeAudio) {
+let item = function(name, description, interactions, takeAudio, discovered) {
     this.name = name;
     this.description = description;
     this.interactions = interactions;
     this.takeAudio = takeAudio;
+    this.discovered = discovered;
 };
 
 function loadItems() {
     
-    // shovel -------------------------
+    // shovel -------------------------------------------------------------------------------------
     
     items["shovel"] = new item(
         
@@ -44,10 +45,39 @@ function loadItems() {
             return gameState;
             },
         },
-        takeAudio = pick_up_shovel
+        takeAudio = pick_up_shovel, 
+        discovered = true
         );
     
     items["shovel"].usedInOpening = (false);
+    
+    
+    // keys -------------------------------------------------------------------------------------
+    
+    items["keys"] = new item(
+        
+        // name -----------------------
+        "keys", 
+        
+        // description ----------------
+        "", 
+        
+        // interactions ---------------
+        {
+            
+            // interactions
+            examine: "The keys are covered in rust...",
+            
+            // use is switching on and off the radio
+            use: function() {
+                    
+                gameState.actionResponse = "You cannot use the keys here.";
+                return gameState;
+            },
+        },
+        takeAudio = pick_up_keys,
+        discovered = false
+        );
     
     
     

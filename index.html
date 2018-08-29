@@ -1,76 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-    <!--bootstrap-->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!--jquery-->
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-
-    <!--Howler-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.10/howler.min.js"></script>
-
-
-    <!--main js sheet-->
-    <script src="js/main.js"></script>
-
-    <!--audio_files.js-->
-    <script src="js/audio_files.js"></script>
-
-    <!--items.js-->
-    <script src="js/items.js"></script>
-
-    <!--rooms-->
-    <script src="js/rooms.js"></script>
-
-    <!--game state.js-->
-    <script src="js/game_state.js"></script>
-    
-    <!--verbs.js-->
-    <script src="js/verbs.js"></script>
-    
-    <!--itemVerbs.js-->
-    <script src="js/itemVerbs.js"></script>
-
-    <!--text_engine.js-->
-    <script src="js/text_engine.js"></script>
-
-    <!--audio_engine js-->
-    <script src="js/audio_engine.js"></script>
-    
-    <!--tests-->
-    <script src="js/tests.js"></script>
-
-    <!--style sheet-->
-    <link rel="stylesheet" href="css/style.css" type="text/css" />
-
     <title>Pitch Black</title>
+    
+    <!--Bootstrap CSS-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
+
+    <!--Custom CSS-->
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+    
+    <!--JQuery, Popper, Bootstrap JS-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    
+    <!--Custom JS-->
+    <script type="text/javascript" src="/js/main.js"></script>
+    
+    <!--Font-->
+    <link href="https://fonts.googleapis.com/css?family=Quattrocento" rel="stylesheet">
+    
+    <!--Font Awesome-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    
+    
 </head>
 
 
-
-<body onload="loadGameState(); acceptUserInput(); playStartingSounds()">
-
-    <div class="container">
-
-        <!--inputLog-->
-        <textarea id="console" class="console" disabled></textarea>
+<body>
+    
+    <div class="container pre-game-container">
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <h2 class="game-header">PITCH BLACK</h2>
+            </div>
+        </div>
         
-        <div class="forest-background"></div>
-
-        <!--user input form: submits on enter-->
-        <form id="myForm" name="answerForm" onsubmit="acceptUserInput(); this.reset(); return false;" action="#">
-            <!--hidden by default-->
-            <input type="text" name="userInput" id="userInput" placeholder="your response..." autofocus autocomplete="off" visibility="hidden"></input>
-        </form>
-
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <p>Pitch Black is a text adventure game with an emphasis on audio playback and atmosphere. Please use headphones or speakers while playing for maximum effect.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <p>Pitch Black is incomplete. The game was built as an exercise in writing OOP in JavaScript. I intend to add to the game over time.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-sm-12">
+                <form action="https://audio-adventure-johnpooch.c9users.io/game.html">
+                    <input type="submit" value="Start Game" />
+                </form>
+            </div>
+        </div>
     </div>
-
 </body>
-
 </html>

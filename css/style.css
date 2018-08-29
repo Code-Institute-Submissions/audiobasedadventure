@@ -1,8 +1,20 @@
 body {
     background-color: black;
+    color: #95a5a5;
+    font-family: 'Quattrocento', serif;
 }
 
+/* Pre Game --------------------------------------------------------------------------------------- */
+
+.pre-game-container {
+    padding-top: 4rem;
+    text-align: center
+}
+
+/* In Game ---------------------------------------------------------------------------------------- */
+
 .container {
+    font-size: 1.4rem;
     margin-top: 20px;
 }
 
@@ -21,11 +33,11 @@ body {
     resize: none;
     border: 0px;
     background-color: black;
-    color: #95a5a5;
 }
 
 #console {
     margin: 0px;
+    z-index: 1;
 }
 
 #userInput {
@@ -39,4 +51,11 @@ body {
 
 input:focus {
     outline: 0;
+}
+
+@media only screen and (max-width: 767px) {
+  /* phones */
+  .forest-background {
+      display: none;
+  }
 }

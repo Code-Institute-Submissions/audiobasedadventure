@@ -1,34 +1,39 @@
 // acceptUserInput ==================================================================================
 
+function parseUserInput(userInput) {
+
+    var wordsArray = [];
+    var wordReplacementPairs = { "head": "go", "walk": "go", "move": "go", "travel": "go", "run": "go", "dig": "use shovel", "pick up": "take", "grab": "take" };
+    var wordsToDelete = new Set(["to", "the", "with"]);
+    
+    // replace words
+    for(var key in wordReplacementPairs) {
+        userInput = userInput.replace(key, wordReplacementPairs[key]);
+    }
+    userInput = userInput.split(" ");
+    
+    // delete unwanted words
+    for (var i = 0; i < userInput.length; i++) {
+        if (wordsToDelete.has(userInput[i])) {
+            continue;
+        }
+        wordsArray.push(userInput[i]);
+    }
+    return wordsArray;
+}
+
 
 function acceptUserInput() {
 
     // CLEAN
 
     var userInput = document.getElementById("userInput").value.toLowerCase();
-    var userInputWords = userInput.split(" ");
-    var userInputWordsCleaned = deleteUnwantedWords(userInputWords);
-    var userInputWordsParsed = parser(userInputWordsCleaned);
+
+    userInput = parseUserInput(userInput);
+
+    var userVerb = userInput[0];
+    var userNouns = userInput.slice(1, userInput.length);
     
-    var userInputWordsFinal = [];
-    for (var i = 0; i < userInputWordsParsed.length; i ++ ) {
-        
-        var split = userInputWordsParsed[i].split(" ");
-        console.log(split);
-        
-        for(var j = 0; j < split.length; j ++) {
-            
-            userInputWordsFinal.push(split[j]);
-        }
-    }
-
-    console.log(userInputWordsFinal)
-
-    var userVerb = userInputWordsFinal[0];
-    var userNouns = userInputWordsFinal.slice(1, userInputWordsFinal.length);
-    
-    console.log(userNouns)
-
     gameState = processUserInput(userVerb, userNouns);
 
     // CORE VERBS ARE WORKING BUT I NEED HELP MAKING THE ITEM VERBS WORK.
@@ -42,22 +47,6 @@ function acceptUserInput() {
 
     var gameStateAsString = unpackGameStateIntoString(gameState);
     printGameStateToUser(gameStateAsString);
-}
-
-// deleteUnwantedWords ============================================================================
-
-function deleteUnwantedWords(userInputWords) {
-
-    var userInputWordsCleaned = [];
-    var wordsToDelete = new Set(["to", "the"]);
-
-    for (var i = 0; i < userInputWords.length; i++) {
-        if (wordsToDelete.has(userInputWords[i])) {
-            continue;
-        }
-        userInputWordsCleaned.push(userInputWords[i]);
-    }
-    return userInputWordsCleaned;
 }
 
 // parser =========================================================================================
