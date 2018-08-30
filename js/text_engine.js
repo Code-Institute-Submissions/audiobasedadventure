@@ -1,4 +1,5 @@
-// acceptUserInput ==================================================================================
+
+// parser =========================================================================================
 
 function parseUserInput(userInput) {
 
@@ -22,10 +23,9 @@ function parseUserInput(userInput) {
     return wordsArray;
 }
 
+// acceptUserInput ==================================================================================
 
 function acceptUserInput() {
-
-    // CLEAN
 
     var userInput = document.getElementById("userInput").value.toLowerCase();
 
@@ -36,34 +36,8 @@ function acceptUserInput() {
     
     gameState = processUserInput(userVerb, userNouns);
 
-    // CORE VERBS ARE WORKING BUT I NEED HELP MAKING THE ITEM VERBS WORK.
-
-    // var inventoryAndRoomItemsCombined = gameState.currentRoom.itemsInRoom.concat(gameState.inventory);
-    // for (var i = 0; i < inventoryAndRoomItemsCombined.length; i++) {
-    //     if (userNouns[0] == inventoryAndRoomItemsCombined[i].name && userVerb in inventoryAndRoomItemsCombined[i].interactions) {
-    //         gameState = inventoryAndRoomItemsCombined[i].interactions[userVerb].process(userNouns);
-    //     }
-    // }
-
     var gameStateAsString = unpackGameStateIntoString(gameState);
     printGameStateToUser(gameStateAsString);
-}
-
-// parser =========================================================================================
-
-function parser(userInputWords) {
-
-    var wordReplacementPairs = { "head": "go", "walk": "go", "move": "go", "travel": "go", "run": "go", "dig": "use shovel" };
-
-    for (var i = 0; i < userInputWords.length; i++) {
-        if (userInputWords[i] in wordReplacementPairs) {
-            userInputWords[i] = wordReplacementPairs[userInputWords[i]];
-            if (userInputWords[i] == "") {
-                userInputWords.splice(i, 1);
-            }
-        }
-    }
-    return userInputWords;
 }
 
 // processUserInput ===============================================================================

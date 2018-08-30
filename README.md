@@ -20,7 +20,7 @@ Visually the design is meant to evoke a sense of mystery and atmosphere.
 
 ### Features
 
-* Multiple commands: 'go', 'take', 'use', 'examine', 'inventory'
+* Multiple commands: 'go', 'take', 'use', 'examine', 'inventory', 'drop', 'restart'
 * User input is parsed so that commands like 'pick up the shovel' and 'take shovel' both result in the same outcome.
 * Audio feedback occurs when players give valid commands.
 

@@ -42,23 +42,6 @@ function examine(userNouns) {
     return gameState;
 }
 
-//  explore ---------------------------------------------------------------------------------------
-
-function explore(userNouns) {
-
-    if (userNouns[0] != "surroundings") {
-        gameState.actionResponse = "You can only explore 'surroundings'.";
-    }
-    else {
-        gameState.actionResponse = "You use your hands to explore your surroundings.\n";
-        for (var i = 0; i < gameState.currentRoom.itemsInRoom.length; i++) {
-            var itemToExplore = gameState.currentRoom.itemsInRoom[i]
-            gameState.actionResponse += itemToExplore.interactions["explore"];
-        }
-    }
-    return gameState;
-}
-
 // take -------------------------------------------------------------------------------------------
 
 function take(userNouns) {
@@ -117,7 +100,7 @@ function use(userNouns) {
             return gameState;
         }
     }
-    gameState.actionResponse = "There is no " + userNouns[0] + " nearby  or in your inventory.";
+    gameState.actionResponse = "There is no " + userNouns[0] + " nearby or in your inventory.";
     return gameState;
 }
 
@@ -165,14 +148,6 @@ verbs["go"] = new verb("go", 1, function(userNouns) {
 
 verbs["examine"] = new verb("examine", 1, function(userNouns) {
     return examine(userNouns);
-});
-
-verbs["explore"] = new verb("explore", 1, function(userNouns) {
-    return explore(userNouns);
-});
-
-verbs["identify"] = new verb("identify", 1, function(userNouns) {
-    return identify(userNouns);
 });
 
 verbs["take"] = new verb("take", 1, function(userNouns) {

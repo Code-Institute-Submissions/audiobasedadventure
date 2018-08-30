@@ -7,13 +7,9 @@ let Room = function(name, description, keyRoomDict, coordinates, itemsInRoom) {
     this.keyRoomDict = keyRoomDict;
     this.coordinates = coordinates;
     this.itemsInRoom = itemsInRoom;
-    // this.hasBeenEntered = false;
 };
 
 // methods ----------------------------------------------------------------------------------------
-
-
-
 
 function loadRooms() {
     

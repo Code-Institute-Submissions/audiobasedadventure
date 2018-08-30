@@ -1,5 +1,9 @@
 // AUDIO ENGINE ===================================================================================
 
+/* This script is currently unused but might be used in future developments. The code adjusts the position and amplitude of sound sources depending 
+on the sources location in the game. */
+
+
 function playCurrentRoomAudio() 
 {
     for (var i = 0; i < currentRoom.audioObject.length; i++) 
