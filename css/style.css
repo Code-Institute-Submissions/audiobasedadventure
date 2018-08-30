@@ -7,6 +7,7 @@ body {
 /* Pre Game --------------------------------------------------------------------------------------- */
 
 .pre-game-container {
+    font-size: 1rem!important;
     padding-top: 4rem;
     text-align: center
 }
@@ -14,7 +15,7 @@ body {
 /* In Game ---------------------------------------------------------------------------------------- */
 
 .container {
-    font-size: 1rem;
+    font-size: 1.4rem;
     margin-top: 20px;
 }
 
